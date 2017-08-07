@@ -12,12 +12,15 @@ import java.util.ArrayList;
 
 public class GranularitySliderPanel extends JPanel {
 
+    ArrayList<Integer> thresholds;
     private JSlider breakDownThresholdSlider;
     JButton sliderConfirmBtn;
     ASIAAction asiaAction;
 
-    public GranularitySliderPanel(ASIAAction _asiaAction) {
+
+    public GranularitySliderPanel(ASIAAction _asiaAction, ArrayList<Integer> _thresholds) {
         super();
+        thresholds = _thresholds;
         asiaAction = _asiaAction; //BAD Design
 
         this.setLayout(new BoxLayout(this , BoxLayout.X_AXIS));
@@ -33,8 +36,6 @@ public class GranularitySliderPanel extends JPanel {
 
     private void createSlider()
     {
-        ArrayList<Integer> thresholds = asiaAction.preProcessBreakDownWithDifferentThresholds();
-        thresholds.add(asiaAction.WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER);
         breakDownThresholdSlider = new TransparentSlider(JSlider.HORIZONTAL, 0, thresholds.size()-1, 0);
         breakDownThresholdSlider.setSnapToTicks(true);
         breakDownThresholdSlider.setMajorTickSpacing(1);

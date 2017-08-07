@@ -166,16 +166,17 @@ public class ASIAAction extends AnAction
         firstLowestSameLevelPsiElement = pair.first;
         secondLowestSameLevelPsiElement = pair.second;
 
-        showStartingEndingParentOfSelection();
+        //showStartingEndingParentOfSelection();
 
-
-        if(true)
+        ArrayList<Integer> thresholds = preProcessBreakDownWithDifferentThresholds();
+        if(thresholds.size()==0)
+        {
+            // Not enough code is selected.
+            System.out.print("Not enough code is selected.");
             return;
+        }
 
-
-
-
-        JPanel granularitySliderPanel = new GranularitySliderPanel(this);
+        JPanel granularitySliderPanel = new GranularitySliderPanel(this, thresholds);
         sliderPopup = JBPopupFactory.getInstance().createComponentPopupBuilder(granularitySliderPanel, null).setAlpha(0.5f) .createPopup();
         sliderPopup.showInFocusCenter();
         sliderPopup.addListener(new JBPopupListener()
@@ -193,21 +194,6 @@ public class ASIAAction extends AnAction
                                             clearAllHighlightRange();
                                     }
                                 });
-
-
-
-                //PsiCodeBlock codeFromText = PsiElementFactory.SERVICE.getInstance(project).createCodeBlockFromText("", null);
-                //System.out.print(codeFromText.getText());
-                //ChunkTextToRelatedGroup_basic(codeFromText);
-
-
-                ////////////////////////
-        /*PsiClass psiClass = getPsiClassFromContext(e);
-        GenerateDialog dlg = new GenerateDialog(psiClass);
-        dlg.show();
-        if(dlg.isOK()){
-            generate(psiClass, dlg.getFields());
-        }*/
     }
 
     private boolean showStartingEndingParentOfSelection()
@@ -269,7 +255,7 @@ public class ASIAAction extends AnAction
         return false;
     }
 
-    public ArrayList<Integer> preProcessBreakDownWithDifferentThresholds()
+    private ArrayList<Integer> preProcessBreakDownWithDifferentThresholds()
     {
         ArrayList<ArrayList<StronglyRelatedPsiElements>> possibleResults = new ArrayList<>();
         ArrayList<Integer> thresholds = new ArrayList<>();
@@ -352,7 +338,7 @@ public class ASIAAction extends AnAction
         //Precondition: "startingPsiElement" and "endingPsiElement" must be in same level;
         assert startingPsiElement.getParent() == endingPsiElement.getParent();
         /////////////////////////////// CONST
-        int MIN_BLOCK_SIZE = 1;
+        int MIN_BLOCK_SIZE = 3;
         int MAX_ACCEPTABLE_NOISE = 1;
         /////////////////////////////// TO FILL
         int nStatements = -1;
@@ -365,7 +351,8 @@ public class ASIAAction extends AnAction
         PsiElement p = startingPsiElement;
         while(p!=endingPsiElement.getNextSibling())
         {
-            if (p instanceof PsiStatement || p instanceof CompositePsiElement)
+            //if (p instanceof PsiStatement || p instanceof CompositePsiElement)
+            if(isAMinumumMeaningfullNode(p))
             {
                 ArrayList<String> currentPsiElement_identifiers = getIdentifiersFromPsiElement(p);
                 ///
@@ -380,8 +367,9 @@ public class ASIAAction extends AnAction
         if(maxAccetableVariableDistance==WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER)
         {
             ArrayList<StronglyRelatedPsiElements> stronglyRelatedPsiElements = new ArrayList<>(); //stronglyRelatedCodeSnippet;
-            //ArrayList<PsiElement> currentStronglyRelatedPsiElements_array = new ArrayList<>();
-            //currentStronglyRelatedPsiElements_array.add(_psiCodeBlock);
+
+            if(countNMeaninfulNodeInWholeSubtree(psiElements)<MIN_BLOCK_SIZE && (psiElements.size()==0 || getDirectPsiCodeBlockIfExits(psiElements.get(0))==null))
+                return stronglyRelatedPsiElements;
             stronglyRelatedPsiElements.add(new StronglyRelatedPsiElements(nestedLevel, psiElements, this));
             return stronglyRelatedPsiElements;
         }
@@ -427,7 +415,7 @@ public class ASIAAction extends AnAction
 
 
 
-            if(nStatements<MIN_BLOCK_SIZE && (psiElements.size()==0 || getDirectPsiCodeBlockIfExits(psiElements.get(0))==null))
+            if(countNMeaninfulNodeInWholeSubtree(psiElements)<MIN_BLOCK_SIZE && (psiElements.size()==0 || getDirectPsiCodeBlockIfExits(psiElements.get(0))==null))
                 return stronglyRelatedPsiElements;
 
             while(currentPsiElementIndex<nStatements)
@@ -459,6 +447,27 @@ public class ASIAAction extends AnAction
             }
             return stronglyRelatedPsiElements;
         }
+    }
+
+
+    private int countNMeaninfulNodeInWholeSubtree(ArrayList<PsiElement> es)
+    {
+        int nMeaningfulElements = 0;
+        for(int i=0; i<es.size(); i++)
+            nMeaningfulElements += countNMeaninfulNodeInWholeSubtree(es.get(i));
+        return nMeaningfulElements;
+    }
+
+    private int countNMeaninfulNodeInWholeSubtree(PsiElement e)
+    {
+        PsiElement[] meaningfulElements = PsiTreeUtil.collectElements(e, new PsiElementFilter() {
+            public boolean isAccepted(PsiElement e) {
+                if(isAMinumumMeaningfullNode(e)==true)
+                    return true;
+                return false;
+            }
+        });
+        return meaningfulElements.length;
     }
 
     private PsiCodeBlock getDirectPsiCodeBlockIfExits(PsiElement element)
