@@ -207,11 +207,11 @@ class StronglyRelatedPsiElements
                 return false;
             }
 
-            @Override
+            /*@Override
             @Nullable
             public String getTooltipText() {
                 return "Some Code Explanation. \n New Line?";
-            }
+            }*/
 
             @Override
             public int hashCode()
@@ -278,5 +278,12 @@ class StronglyRelatedPsiElements
             }*/
 
         });
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return true;
+        //return this.psiElements.equals(((StronglyRelatedPsiElements)obj).psiElements);
     }
 }

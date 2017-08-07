@@ -6,19 +6,15 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.*;
-import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.CompositePsiElement;
 import com.intellij.psi.util.PsiElementFilter;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.Icons;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.psi.util.PsiUtil;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 
@@ -29,6 +25,7 @@ public class ASIAAction extends AnAction
 {
     public Editor editor = null;
     PsiElement lowestCommonAncestorPsiElement = null;
+    PsiElement firstLowestSameLevelPsiElement=null,secondLowestSameLevelPsiElement=null;
     ///////
     ArrayList<StronglyRelatedPsiElements> listOfStronglyRelatedPsiElements = null;
     final int WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER = -1;
@@ -71,6 +68,61 @@ public class ASIAAction extends AnAction
         return supposalLCA;
     }
 
+    private boolean isAMinumumMeaningfullNode(PsiElement e)
+    {
+        if(e instanceof PsiStatement == false && e instanceof PsiMethod == false && e instanceof PsiClass == false && e instanceof PsiJavaFile==false)
+            return false;
+        return true;
+    }
+
+    private Pair<PsiElement, PsiElement> findLowestSameLevelStatement(PsiElement selectionStartPsiElement, PsiElement selectionEndPsiElement)
+    {
+        Pair<PsiElement, PsiElement> pair = findLowestSameLevelPsiElements(selectionStartPsiElement, selectionEndPsiElement);
+
+        firstLowestSameLevelPsiElement = pair.first;
+        while(firstLowestSameLevelPsiElement!=null && firstLowestSameLevelPsiElement instanceof PsiWhiteSpace)
+            firstLowestSameLevelPsiElement = firstLowestSameLevelPsiElement.getNextSibling();
+
+        secondLowestSameLevelPsiElement = pair.second;
+        while(secondLowestSameLevelPsiElement!=null && secondLowestSameLevelPsiElement instanceof PsiWhiteSpace)
+            secondLowestSameLevelPsiElement = secondLowestSameLevelPsiElement.getPrevSibling();
+
+        if(isAMinumumMeaningfullNode(firstLowestSameLevelPsiElement) == false || isAMinumumMeaningfullNode(secondLowestSameLevelPsiElement) ==false)
+        {
+            PsiElement lowestStatement = findLowestStatement(firstLowestSameLevelPsiElement);
+            return new Pair<>(lowestStatement, lowestStatement);
+        }
+        else
+            return new Pair<>(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement);
+    }
+
+    private Pair<PsiElement, PsiElement> findLowestSameLevelPsiElements(PsiElement selectionStartPsiElement, PsiElement selectionEndPsiElement)
+    {
+        if(selectionStartPsiElement==selectionEndPsiElement)
+        {
+            return new Pair<>(selectionStartPsiElement, selectionEndPsiElement);
+        }
+
+        PsiElement lowestCommonAncestor = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
+        PsiElement firstLowestSameLevelPsiElement = selectionStartPsiElement;
+        while(firstLowestSameLevelPsiElement.getParent() != lowestCommonAncestor)
+            firstLowestSameLevelPsiElement = firstLowestSameLevelPsiElement.getParent();
+        PsiElement secondLowestSameLevelPsiElement = selectionEndPsiElement;
+        while(secondLowestSameLevelPsiElement .getParent() != lowestCommonAncestor)
+            secondLowestSameLevelPsiElement  = secondLowestSameLevelPsiElement.getParent();
+
+        return new Pair<>(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement);
+    }
+
+    private PsiElement findLowestStatement(PsiElement e)
+    {
+        //while(e !=null && PsiUtil.isStatement(e)==false)
+        while(e!=null  && isAMinumumMeaningfullNode(e) == false) //&& e instanceof PsiExpressionStatement==false && e instanceof CompositePsiElement == false
+            e = e.getParent();
+
+        return e;
+    }
+
     @Override
     public void actionPerformed(AnActionEvent e)
     {
@@ -84,19 +136,16 @@ public class ASIAAction extends AnAction
         final Document document = editor.getDocument(); //Access document, caret, and selection
 
 
-
         final SelectionModel selectionModel = editor.getSelectionModel();
         int selectionStartOffset = selectionModel.getSelectionStart();
         int selectionEndOffset = selectionModel.getSelectionEnd();
         editor.getSelectionModel().removeSelection();
         PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
         PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
-        //highlightRange(selectionStartPsiElement.getTextRange(), 0);
-        //highlightRange(selectionEndPsiElement.getTextRange(), 1);
-        lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
-        //highlightRange(lowestCommonAncestorPsiElement.getTextRange(), 0);
 
-        while(lowestCommonAncestorPsiElement instanceof PsiCodeBlock == false && lowestCommonAncestorPsiElement instanceof PsiMethod == false && lowestCommonAncestorPsiElement instanceof PsiJavaFile == false)
+        lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
+
+        /*while(lowestCommonAncestorPsiElement instanceof PsiCodeBlock == false && lowestCommonAncestorPsiElement instanceof PsiMethod == false && lowestCommonAncestorPsiElement instanceof PsiJavaFile == false)
         {
             lowestCommonAncestorPsiElement = lowestCommonAncestorPsiElement.getParent();
         }
@@ -106,7 +155,49 @@ public class ASIAAction extends AnAction
         {
             clearAllHighlightRange();
             return;
+        }*/
+
+
+        clearAllHighlightRange();
+
+        //PsiUtil.getTopLevelEnclosingCodeBlock()
+        //PsiUtil.getEnclosingStatement()
+        Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
+        firstLowestSameLevelPsiElement = pair.first;
+        secondLowestSameLevelPsiElement = pair.second;
+
+        if(firstLowestSameLevelPsiElement==null || secondLowestSameLevelPsiElement==null)
+        {
+            System.out.print("starting or ending statement is null");
+            return;
         }
+
+        clearAllHighlightRange();
+        if(firstLowestSameLevelPsiElement!=secondLowestSameLevelPsiElement)
+        {
+            highlightRange(firstLowestSameLevelPsiElement.getTextRange().getStartOffset(), firstLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.RED);
+            highlightRange(secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.YELLOW);
+        }
+        else
+        {
+            highlightRange(secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.ORANGE);
+        }
+
+        PsiElement parentOfBoth = firstLowestSameLevelPsiElement.getParent();
+        if(secondLowestSameLevelPsiElement.getParent()!=parentOfBoth)
+        {
+            clearAllHighlightRange();
+            highlightRange(parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.BLACK);
+        }
+        else
+            highlightRange(parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.CYAN);
+
+
+        if(true)
+            return;
+
+        tryToBreakDownSelectedCode(1);
+
 
 
 
@@ -157,27 +248,66 @@ public class ASIAAction extends AnAction
         highlightAllDiscoveredCodeSnippet();
     }
 
+    private boolean isEquals_TwoStronglyRelatedPsiElementsArrayList(ArrayList<StronglyRelatedPsiElements> a, ArrayList<StronglyRelatedPsiElements> b)
+    {
+        if(a.size()!=b.size()) return false;
+        for(int i=0; i<a.size();i++)
+            if(a.get(0).equals(b.get(0))==false)
+                return false;
+        return true;
+
+    }
+
+    private boolean exists_f(ArrayList<ArrayList<StronglyRelatedPsiElements>> possibleResults, ArrayList<StronglyRelatedPsiElements> newResult)
+    {
+        for(int i=0;i<possibleResults.size();i++)
+            if(isEquals_TwoStronglyRelatedPsiElementsArrayList(possibleResults.get(i),newResult)==true)
+                return true;
+        return false;
+    }
+
     public ArrayList<Integer> preProcessBreakDownWithDifferentThresholds()
     {
+        ArrayList<ArrayList<StronglyRelatedPsiElements>> possibleResults = new ArrayList<>();
         ArrayList<Integer> thresholds = new ArrayList<>();
-        int value = 1;
-        int lastN = -1;
-        while(value<10)
+
+        ///////////// 1/2
+        for(int value=1;value<10;value++)
         {
             tryToBreakDownSelectedCode(value);
-            if(listOfStronglyRelatedPsiElements!=null && lastN!=listOfStronglyRelatedPsiElements.size())
+            if(listOfStronglyRelatedPsiElements!=null && listOfStronglyRelatedPsiElements.size()!=0 && exists_f(possibleResults, listOfStronglyRelatedPsiElements)==false)
             {
                 thresholds.add(value);
-                lastN = listOfStronglyRelatedPsiElements.size();
+                possibleResults.add(listOfStronglyRelatedPsiElements);
             }
-            value++;
         }
+        ///////////// 2/2
+        tryToBreakDownSelectedCode(WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER);
+        if(listOfStronglyRelatedPsiElements!=null && listOfStronglyRelatedPsiElements.size()!=0 && exists_f(possibleResults, listOfStronglyRelatedPsiElements)==false)
+        {
+            thresholds.add(WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER);
+            possibleResults.add(listOfStronglyRelatedPsiElements);
+        }
+
+
         return thresholds;
     }
 
     public void tryToBreakDownSelectedCode(int sliderValue)
     {
-        if( ASIAAction.this.lowestCommonAncestorPsiElement instanceof PsiCodeBlock)
+        if(firstLowestSameLevelPsiElement!=null && secondLowestSameLevelPsiElement!=null)
+        {
+            listOfStronglyRelatedPsiElements = breakDownPsiElementToRelatedParts(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement, 0, sliderValue);
+            highlightAllDiscoveredCodeSnippet();
+        }
+        else
+        {
+            listOfStronglyRelatedPsiElements = null;
+            System.out.print("Starting or Ending PsiElement is null");
+        }
+
+
+        /*if( ASIAAction.this.lowestCommonAncestorPsiElement instanceof PsiCodeBlock)
         {
             listOfStronglyRelatedPsiElements = breakDownPsiElementToRelatedParts((PsiCodeBlock) ASIAAction.this.lowestCommonAncestorPsiElement, 0, sliderValue);
             highlightAllDiscoveredCodeSnippet();
@@ -186,7 +316,7 @@ public class ASIAAction extends AnAction
         {
             listOfStronglyRelatedPsiElements = null;
             System.out.print("Common parent is not PsiCodeBlock");
-        }
+        }*/
     }
 
     public void highlightAllDiscoveredCodeSnippet()
@@ -211,6 +341,13 @@ public class ASIAAction extends AnAction
 
     private ArrayList<StronglyRelatedPsiElements> breakDownPsiElementToRelatedParts(PsiCodeBlock _psiCodeBlock, int nestedLevel, int maxAccetableVariableDistance)
     {
+        return breakDownPsiElementToRelatedParts(_psiCodeBlock.getFirstBodyElement(), _psiCodeBlock.getLastBodyElement(), nestedLevel, maxAccetableVariableDistance);
+    }
+
+    private ArrayList<StronglyRelatedPsiElements> breakDownPsiElementToRelatedParts(PsiElement startingPsiElement, PsiElement endingPsiElement, int nestedLevel, int maxAccetableVariableDistance)
+    {
+        //Precondition: "startingPsiElement" and "endingPsiElement" must be in same level;
+        assert startingPsiElement.getParent() == endingPsiElement.getParent();
         /////////////////////////////// CONST
         int MIN_BLOCK_SIZE = 1;
         int MAX_ACCEPTABLE_NOISE = 1;
@@ -222,10 +359,10 @@ public class ASIAAction extends AnAction
         ArrayList<ArrayList<Integer>> directlyRelatedAdjMatrix= new ArrayList<>();
         ArrayList<ArrayList<Integer>> indirectlyRelatedAdjMatrix= new ArrayList<>();
         ///////////////////////////////
-        PsiElement p = _psiCodeBlock.getFirstChild();
-        while(p!=null)
+        PsiElement p = startingPsiElement;
+        while(p!=endingPsiElement.getNextSibling())
         {
-            if (p instanceof PsiStatement)
+            if (p instanceof PsiStatement || p instanceof CompositePsiElement)
             {
                 ArrayList<String> currentPsiElement_identifiers = getIdentifiersFromPsiElement(p);
                 ///
@@ -240,9 +377,9 @@ public class ASIAAction extends AnAction
         if(maxAccetableVariableDistance==WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER)
         {
             ArrayList<StronglyRelatedPsiElements> stronglyRelatedPsiElements = new ArrayList<>(); //stronglyRelatedCodeSnippet;
-            ArrayList<PsiElement> currentStronglyRelatedPsiElements_array = new ArrayList<>();
-            currentStronglyRelatedPsiElements_array.add(_psiCodeBlock);
-            stronglyRelatedPsiElements.add(new StronglyRelatedPsiElements(nestedLevel, currentStronglyRelatedPsiElements_array, this));
+            //ArrayList<PsiElement> currentStronglyRelatedPsiElements_array = new ArrayList<>();
+            //currentStronglyRelatedPsiElements_array.add(_psiCodeBlock);
+            stronglyRelatedPsiElements.add(new StronglyRelatedPsiElements(nestedLevel, psiElements, this));
             return stronglyRelatedPsiElements;
         }
         else
@@ -287,7 +424,7 @@ public class ASIAAction extends AnAction
 
 
 
-            if(nStatements<MIN_BLOCK_SIZE)
+            if(nStatements<MIN_BLOCK_SIZE && (psiElements.size()==0 || getDirectPsiCodeBlockIfExits(psiElements.get(0))==null))
                 return stronglyRelatedPsiElements;
 
             while(currentPsiElementIndex<nStatements)
@@ -301,14 +438,14 @@ public class ASIAAction extends AnAction
                 currentPsiElementIndex = latestContinuesIndex+1;
 
                 PsiElement theOnlyElement = currentStronglyRelatedPsiElements_array.get(0);
-                PsiBlockStatement childBlockStarement = getDirectPsiBlockStatementIfExits(theOnlyElement);
+                PsiCodeBlock childCodeBlock = getDirectPsiCodeBlockIfExits(theOnlyElement);
 
-                if (currentStronglyRelatedPsiElements_array.size() == 1 && childBlockStarement!=null)
+                if (currentStronglyRelatedPsiElements_array.size() == 1 && childCodeBlock!=null)
                 {
 
-                    if (childBlockStarement != null)
+                    if (childCodeBlock != null)
                     {
-                        ArrayList<StronglyRelatedPsiElements> result = breakDownPsiElementToRelatedParts((PsiCodeBlock) childBlockStarement.getFirstChild(), nestedLevel + 1, maxAccetableVariableDistance);
+                        ArrayList<StronglyRelatedPsiElements> result = breakDownPsiElementToRelatedParts(childCodeBlock, nestedLevel + 1, maxAccetableVariableDistance);
 
                         for (int i = 0; i < result.size(); i++)
                             stronglyRelatedPsiElements.add(result.get(i));
@@ -321,13 +458,13 @@ public class ASIAAction extends AnAction
         }
     }
 
-    private PsiBlockStatement getDirectPsiBlockStatementIfExits(PsiElement element)
+    private PsiCodeBlock getDirectPsiCodeBlockIfExits(PsiElement element)
     {
         PsiElement[] children = element.getChildren();
         for(int i=0; i<children.length; i++)
         {
             if(children[i] instanceof PsiBlockStatement)
-                return (PsiBlockStatement)children[i];
+                return (PsiCodeBlock)(children[i].getFirstChild());
         }
         return null;
     }
@@ -339,15 +476,19 @@ public class ASIAAction extends AnAction
     }
 
 
-    /*private void highlightRange(int startOffset, int endOffset, int nestedLevel, boolean b, int highlightZ)
+    private void highlightRange(int startOffset, int endOffset)
     {
-        Color color = getColor(nestedLevel, b);
-        TextAttributes myTextAtt = new TextAttributes(Color.BLACK, color, Color.BLACK, EffectType.ROUNDED_BOX, Font.ITALIC);
-        RangeHighlighter rh = editor.getMarkupModel().addRangeHighlighter(startOffset, endOffset, highlightZ, myTextAtt, HighlighterTargetArea.EXACT_RANGE);
+        Color color = getColor(0, true);
+        highlightRange(startOffset, endOffset, color);
 
     }
+    private void highlightRange(int startOffset, int endOffset, Color c)
+    {
+        TextAttributes myTextAtt = new TextAttributes(Color.BLACK, c, Color.BLACK, EffectType.ROUNDED_BOX, Font.ITALIC);
+        RangeHighlighter rh = editor.getMarkupModel().addRangeHighlighter(startOffset, endOffset, 6000, myTextAtt, HighlighterTargetArea.EXACT_RANGE);
+    }
 
-    private void highlightRange(TextRange r,  int nestedLevel, boolean b, int highlightZ)
+    /*private void highlightRange(TextRange r,  int nestedLevel, boolean b, int highlightZ)
     {
         highlightRange(r.getStartOffset(), r.getEndOffset(), nestedLevel, b, highlightZ);
     }*/
@@ -364,6 +505,7 @@ public class ASIAAction extends AnAction
 
     private int countNStatementsInPsiElement(PsiElement _parentPsiElement)
     {
+        //TODO : Count Leafes
         int nStatements = 0;
 
         if(_parentPsiElement instanceof PsiStatement)
@@ -537,7 +679,7 @@ public class ASIAAction extends AnAction
         final Project project = e.getData(CommonDataKeys.PROJECT);
         PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
-        e.getPresentation().setVisible((project != null && editor != null  && editor.getSelectionModel().hasSelection()));
+        e.getPresentation().setVisible((project != null && editor != null));
 
     }
 

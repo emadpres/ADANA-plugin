@@ -36,6 +36,7 @@ public class GranularitySliderPanel extends JPanel {
         ArrayList<Integer> thresholds = asiaAction.preProcessBreakDownWithDifferentThresholds();
         thresholds.add(asiaAction.WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER);
         breakDownThresholdSlider = new TransparentSlider(JSlider.HORIZONTAL, 0, thresholds.size()-1, 0);
+        breakDownThresholdSlider.setSnapToTicks(true);
         breakDownThresholdSlider.setMajorTickSpacing(1);
         breakDownThresholdSlider.setPaintTicks(true);
         breakDownThresholdSlider.addChangeListener(new ChangeListener()
