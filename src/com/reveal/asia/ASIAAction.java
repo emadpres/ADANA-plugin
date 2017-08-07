@@ -166,38 +166,11 @@ public class ASIAAction extends AnAction
         firstLowestSameLevelPsiElement = pair.first;
         secondLowestSameLevelPsiElement = pair.second;
 
-        if(firstLowestSameLevelPsiElement==null || secondLowestSameLevelPsiElement==null)
-        {
-            System.out.print("starting or ending statement is null");
-            return;
-        }
-
-        clearAllHighlightRange();
-        if(firstLowestSameLevelPsiElement!=secondLowestSameLevelPsiElement)
-        {
-            highlightRange(firstLowestSameLevelPsiElement.getTextRange().getStartOffset(), firstLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.RED);
-            highlightRange(secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.YELLOW);
-        }
-        else
-        {
-            highlightRange(secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.ORANGE);
-        }
-
-        PsiElement parentOfBoth = firstLowestSameLevelPsiElement.getParent();
-        if(secondLowestSameLevelPsiElement.getParent()!=parentOfBoth)
-        {
-            clearAllHighlightRange();
-            highlightRange(parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.BLACK);
-        }
-        else
-            highlightRange(parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.CYAN);
+        showStartingEndingParentOfSelection();
 
 
         if(true)
             return;
-
-        tryToBreakDownSelectedCode(1);
-
 
 
 
@@ -235,6 +208,36 @@ public class ASIAAction extends AnAction
         if(dlg.isOK()){
             generate(psiClass, dlg.getFields());
         }*/
+    }
+
+    private boolean showStartingEndingParentOfSelection()
+    {
+        if(firstLowestSameLevelPsiElement==null || secondLowestSameLevelPsiElement==null)
+        {
+            System.out.print("starting or ending statement is null");
+            return true;
+        }
+
+        clearAllHighlightRange();
+        if(firstLowestSameLevelPsiElement!=secondLowestSameLevelPsiElement)
+        {
+            highlightRange(firstLowestSameLevelPsiElement.getTextRange().getStartOffset(), firstLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.RED);
+            highlightRange(secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.YELLOW);
+        }
+        else
+        {
+            highlightRange(secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.ORANGE);
+        }
+
+        PsiElement parentOfBoth = firstLowestSameLevelPsiElement.getParent();
+        if(secondLowestSameLevelPsiElement.getParent()!=parentOfBoth)
+        {
+            clearAllHighlightRange();
+            highlightRange(parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.BLACK);
+        }
+        else
+            highlightRange(parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.CYAN);
+        return false;
     }
 
     public void fetchDescriptions()
