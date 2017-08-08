@@ -4,7 +4,9 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.markup.*;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.popup.*;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
@@ -12,17 +14,27 @@ import com.intellij.psi.impl.source.tree.CompositePsiElement;
 import com.intellij.psi.util.PsiElementFilter;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
+import groovy.swing.factory.DialogFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+
 
 /**
  * Created by emadpres on 7/25/17.
  */
 public class ASIAAction extends AnAction
 {
+    /////////////////////////////// CONST
+    int MIN_BLOCK_SIZE = 3;
+    int MAX_ACCEPTABLE_NOISE = 1;
+    ///////////////////////////////
     public Editor editor = null;
     PsiElement lowestCommonAncestorPsiElement = null;
     PsiElement firstLowestSameLevelPsiElement=null,secondLowestSameLevelPsiElement=null;
@@ -80,11 +92,11 @@ public class ASIAAction extends AnAction
         Pair<PsiElement, PsiElement> pair = findLowestSameLevelPsiElements(selectionStartPsiElement, selectionEndPsiElement);
 
         firstLowestSameLevelPsiElement = pair.first;
-        while(firstLowestSameLevelPsiElement!=null && firstLowestSameLevelPsiElement instanceof PsiWhiteSpace)
+        while(firstLowestSameLevelPsiElement!=null && (firstLowestSameLevelPsiElement instanceof PsiWhiteSpace || firstLowestSameLevelPsiElement instanceof PsiComment))
             firstLowestSameLevelPsiElement = firstLowestSameLevelPsiElement.getNextSibling();
 
         secondLowestSameLevelPsiElement = pair.second;
-        while(secondLowestSameLevelPsiElement!=null && secondLowestSameLevelPsiElement instanceof PsiWhiteSpace)
+        while(secondLowestSameLevelPsiElement!=null && (secondLowestSameLevelPsiElement instanceof PsiWhiteSpace || secondLowestSameLevelPsiElement instanceof PsiComment))
             secondLowestSameLevelPsiElement = secondLowestSameLevelPsiElement.getPrevSibling();
 
         if(isAMinumumMeaningfullNode(firstLowestSameLevelPsiElement) == false || isAMinumumMeaningfullNode(secondLowestSameLevelPsiElement) ==false)
@@ -98,12 +110,16 @@ public class ASIAAction extends AnAction
 
     private Pair<PsiElement, PsiElement> findLowestSameLevelPsiElements(PsiElement selectionStartPsiElement, PsiElement selectionEndPsiElement)
     {
-        if(selectionStartPsiElement==selectionEndPsiElement)
+        if(selectionStartPsiElement==selectionEndPsiElement) // || selectionStartPsiElement.getParent()==selectionEndPsiElement.getParent()
         {
             return new Pair<>(selectionStartPsiElement, selectionEndPsiElement);
         }
 
         PsiElement lowestCommonAncestor = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
+
+        if(lowestCommonAncestor==selectionStartPsiElement || lowestCommonAncestor==selectionEndPsiElement)
+            return new Pair<>(lowestCommonAncestor, lowestCommonAncestor);
+
         PsiElement firstLowestSameLevelPsiElement = selectionStartPsiElement;
         while(firstLowestSameLevelPsiElement.getParent() != lowestCommonAncestor)
             firstLowestSameLevelPsiElement = firstLowestSameLevelPsiElement.getParent();
@@ -123,10 +139,141 @@ public class ASIAAction extends AnAction
         return e;
     }
 
+    private Pair<PsiElement, PsiElement> getPsiElementByLineNumber(int startingLine, int endingLine, AnActionEvent e)
+    {
+        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
+        final Document document = editor.getDocument(); //Access document, caret, and selection
+
+
+        startingLine--;
+        int selectionStartOffset = document.getLineStartOffset(startingLine);
+        PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
+        if (document.getLineNumber(selectionStartPsiElement.getTextOffset()) != startingLine)
+            // to handle "PsiWhiteSpace" which is first character in line L, but if you ask what's your line it says L-1. Because half of it is in L-1 and half is in L.
+            selectionStartPsiElement = selectionStartPsiElement.getNextSibling();
+
+
+
+        endingLine--;
+        int selectionEndOffset = document.getLineEndOffset(endingLine);
+        PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
+        if(document.getLineNumber(selectionEndPsiElement.getTextOffset()) != endingLine)
+            selectionEndPsiElement = selectionEndPsiElement.getPrevSibling();
+
+        //highlightRange(selectionStartOffset, selectionEndOffset, Color.GREEN);
+        //highlightRange(selectionStartPsiElement.getTextRange().getStartOffset(), selectionEndPsiElement.getTextRange().getEndOffset(), Color.GREEN);
+
+        return new Pair<>(selectionStartPsiElement, selectionEndPsiElement);
+
+    }
+
+    private void simpleWriteToFile(String filename, String content)
+    {
+        BufferedWriter writer = null;
+        try {
+            File logFile = new File(filename);
+
+            // This will output the full path where the file will be written to...
+            System.out.println(logFile.getCanonicalPath());
+
+            writer = new BufferedWriter(new FileWriter(logFile));
+            writer.write(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // Close the writer regardless of what happens...
+                writer.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    private String getMethodNameFromLineNumber(int methodStartingLineNumber, AnActionEvent e)
+    {
+        Pair<PsiElement,PsiElement> p  = getPsiElementByLineNumber(methodStartingLineNumber, methodStartingLineNumber, e);
+        PsiElement m = p.first;
+        while(m.getParent() instanceof PsiClass==false) //This PsiClass might be different from "topLevelClass" in above line. It could refer to an inner class.
+            m = m.getParent();
+        //System.out.print("Method: "+ ((PsiMethod)m).getName());
+        if(m instanceof PsiMethod==false)
+            return null;
+        else
+            return ((PsiMethod)m).getName();
+    }
+
+    private void processMethod(int methodStartingLine, int methodEndingLine, AnActionEvent e, String currentProjectName, String currentFileName, String currentMethodName)
+    {
+        final int L_MIN = 3, L_MAX = 5;
+        if(methodEndingLine-methodStartingLine+1 < L_MIN )
+            return;
+
+        String currentLFolder = "";
+        String currentMethodFilePrefix = currentFileName+"."+currentMethodName;
+
+
+        for(int l=L_MIN; l<=L_MAX; l++)
+        {
+            int thisMethod_thisL_codeIndex = 0;
+            currentLFolder =  "/Users/emadpres/IdeaProjects/expandedCode/L"+Integer.toString(l)+"/"+currentProjectName+"/";
+            new File(currentLFolder).mkdirs(); //once is enough
+            for(int window_start = methodStartingLine; window_start<=methodEndingLine; window_start++)
+            {
+                int window_end = Math.min(window_start+l-1,methodEndingLine);
+                String expanded_code = processLineRange(window_start, window_end, e);
+                if(expanded_code!=null)
+                {
+                    String currentLFile = currentMethodFilePrefix +"."+ Integer.toString(thisMethod_thisL_codeIndex) + ".java";
+                    simpleWriteToFile(currentLFolder + currentLFile, expanded_code);
+                    thisMethod_thisL_codeIndex++;
+                }
+            }
+        }
+    }
+
+    private String convertPsiELementsToCode(ArrayList<PsiElement> psiElements)
+    {
+        String code = "";
+        for(int i=0;i<psiElements.size();i++)
+            code += psiElements.get(i).getText();
+        //code = code.replace("\n"," ");
+        return code;
+    }
+
+    private String processLineRange(int startingLine, int endingLine, AnActionEvent e)
+    {
+        Pair<PsiElement, PsiElement> elementByLineNumber = getPsiElementByLineNumber(startingLine, endingLine, e);
+        PsiElement selectionStartPsiElement = elementByLineNumber.first;
+        PsiElement selectionEndPsiElement = elementByLineNumber.second;
+        Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
+        PsiElement firstLowestSameLevelPsiElement = pair.first;
+        PsiElement secondLowestSameLevelPsiElement = pair.second;
+        ArrayList<PsiElement> psiElements = createListOfMeaningfulElements(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement);
+
+        if(countNMeaninfulNodeInWholeSubtree(psiElements)<MIN_BLOCK_SIZE)
+        {
+            //System.out.print("Not Enought Code");
+            return null;
+        }
+        else
+        {
+            //highlightRange(firstLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.CYAN);
+
+            String expanded_code = convertPsiELementsToCode(psiElements);
+
+            //final SelectionModel selectionModel = editor.getSelectionModel();
+            //selectionModel.setSelection(firstLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset());
+            //String expanded_code = selectionModel.getSelectedText();
+
+            return expanded_code;
+        }
+    }
+
+
     @Override
     public void actionPerformed(AnActionEvent e)
     {
-
         listOfStronglyRelatedPsiElements = null;
 
         //Get all the required data from data keys
@@ -136,37 +283,43 @@ public class ASIAAction extends AnAction
         final Document document = editor.getDocument(); //Access document, caret, and selection
 
 
+
+
+        int methodStartingLine = Integer.parseInt(Messages.showInputDialog("Method Start Line Number", "Title", null));
+        int methodEndingLine = Integer.parseInt(Messages.showInputDialog("Method End Line Number", "Title", null));
+        String currentFileName = psiFile.getName();
+        currentFileName = currentFileName.substring(0, currentFileName.length()-5); //remove .java
+        String currentProjectName = project.getName();
+        String currentMethodName = getMethodNameFromLineNumber(methodStartingLine, e);
+        if(currentMethodName==null)
+            currentMethodName = Messages.showInputDialog("Can't recognize Method name. Enter:", "Title", null);
+        processMethod(methodStartingLine, methodEndingLine, e, currentProjectName, currentFileName, currentMethodName);
+        if(true)
+            return;
+
+
+
         final SelectionModel selectionModel = editor.getSelectionModel();
         int selectionStartOffset = selectionModel.getSelectionStart();
         int selectionEndOffset = selectionModel.getSelectionEnd();
         editor.getSelectionModel().removeSelection();
+
         PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
         PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
 
+
         lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
-
-        /*while(lowestCommonAncestorPsiElement instanceof PsiCodeBlock == false && lowestCommonAncestorPsiElement instanceof PsiMethod == false && lowestCommonAncestorPsiElement instanceof PsiJavaFile == false)
-        {
-            lowestCommonAncestorPsiElement = lowestCommonAncestorPsiElement.getParent();
-        }
-
-
-        if(lowestCommonAncestorPsiElement instanceof PsiJavaFile)
-        {
-            clearAllHighlightRange();
-            return;
-        }*/
-
 
         clearAllHighlightRange();
 
-        //PsiUtil.getTopLevelEnclosingCodeBlock()
-        //PsiUtil.getEnclosingStatement()
+
         Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
         firstLowestSameLevelPsiElement = pair.first;
         secondLowestSameLevelPsiElement = pair.second;
 
         //showStartingEndingParentOfSelection();
+
+
 
         ArrayList<Integer> thresholds = preProcessBreakDownWithDifferentThresholds();
         if(thresholds.size()==0)
@@ -333,13 +486,25 @@ public class ASIAAction extends AnAction
         return breakDownPsiElementToRelatedParts(_psiCodeBlock.getFirstBodyElement(), _psiCodeBlock.getLastBodyElement(), nestedLevel, maxAccetableVariableDistance);
     }
 
+
+    private ArrayList<PsiElement> createListOfMeaningfulElements(PsiElement startingPsiElement, PsiElement endingPsiElement)
+    {
+        ArrayList<PsiElement> psiElements = new ArrayList<>();
+        PsiElement p = startingPsiElement;
+
+        while(p!=endingPsiElement.getNextSibling())
+        {
+            if(isAMinumumMeaningfullNode(p))
+                psiElements.add(p);
+            p = p.getNextSibling();
+        }
+        return psiElements;
+    }
+
     private ArrayList<StronglyRelatedPsiElements> breakDownPsiElementToRelatedParts(PsiElement startingPsiElement, PsiElement endingPsiElement, int nestedLevel, int maxAccetableVariableDistance)
     {
         //Precondition: "startingPsiElement" and "endingPsiElement" must be in same level;
         assert startingPsiElement.getParent() == endingPsiElement.getParent();
-        /////////////////////////////// CONST
-        int MIN_BLOCK_SIZE = 3;
-        int MAX_ACCEPTABLE_NOISE = 1;
         /////////////////////////////// TO FILL
         int nStatements = -1;
         // For following arrays, index=0 stores the information regarding the 'index'th PsiElement that we are visiting
@@ -348,27 +513,22 @@ public class ASIAAction extends AnAction
         ArrayList<ArrayList<Integer>> directlyRelatedAdjMatrix= new ArrayList<>();
         ArrayList<ArrayList<Integer>> indirectlyRelatedAdjMatrix= new ArrayList<>();
         ///////////////////////////////
-        PsiElement p = startingPsiElement;
-        while(p!=endingPsiElement.getNextSibling())
+
+
+        psiElements = createListOfMeaningfulElements(startingPsiElement, endingPsiElement);
+        nStatements = psiElements.size();
+        for(int i=0; i<nStatements; i++)
         {
-            //if (p instanceof PsiStatement || p instanceof CompositePsiElement)
-            if(isAMinumumMeaningfullNode(p))
-            {
-                ArrayList<String> currentPsiElement_identifiers = getIdentifiersFromPsiElement(p);
-                ///
-                psiElementIdentifiers.add(currentPsiElement_identifiers);
-                psiElements.add(p);
-            }
-            p = p.getNextSibling();
+            ArrayList<String> currentPsiElement_identifiers = getIdentifiersFromPsiElement(psiElements.get(i));
+            psiElementIdentifiers.add(currentPsiElement_identifiers);
         }
 
-        nStatements = psiElementIdentifiers.size();
 
         if(maxAccetableVariableDistance==WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER)
         {
             ArrayList<StronglyRelatedPsiElements> stronglyRelatedPsiElements = new ArrayList<>(); //stronglyRelatedCodeSnippet;
 
-            if(countNMeaninfulNodeInWholeSubtree(psiElements)<MIN_BLOCK_SIZE && (psiElements.size()==0 || getDirectPsiCodeBlockIfExits(psiElements.get(0))==null))
+            if(countNMeaninfulNodeInWholeSubtree(psiElements)<MIN_BLOCK_SIZE)
                 return stronglyRelatedPsiElements;
             stronglyRelatedPsiElements.add(new StronglyRelatedPsiElements(nestedLevel, psiElements, this));
             return stronglyRelatedPsiElements;
