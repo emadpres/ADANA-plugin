@@ -205,9 +205,9 @@ public class ASIAAction extends AnAction
 
     private void processMethod(int methodStartingLine, int methodEndingLine, AnActionEvent e, String currentProjectName, String currentFileName, String currentMethodName)
     {
-        final int L_MIN = 3, L_MAX = 5;
-        if(methodEndingLine-methodStartingLine+1 < L_MIN )
-            return;
+        final int L_MIN = 3, L_MAX = 20;
+        //if(methodEndingLine-methodStartingLine+1 < L_MIN )
+        //    return; //Comment: because we consider "nLines" for sliding window. the fact a expanded part has enough statement will be calculated using AST.
 
         String currentLFolder = "";
         String currentMethodFilePrefix = currentFileName+"."+currentMethodName;
@@ -284,9 +284,17 @@ public class ASIAAction extends AnAction
 
 
 
+        final SelectionModel selectionModel = editor.getSelectionModel();
+        int selectionStartOffset = selectionModel.getSelectionStart();
+        int selectionEndOffset = selectionModel.getSelectionEnd();
+        editor.getSelectionModel().removeSelection();
 
-        int methodStartingLine = Integer.parseInt(Messages.showInputDialog("Method Start Line Number", "Title", null));
-        int methodEndingLine = Integer.parseInt(Messages.showInputDialog("Method End Line Number", "Title", null));
+
+
+        //int methodStartingLine = Integer.parseInt(Messages.showInputDialog("Method Start Line Number", "Title", null));
+        int methodStartingLine = document.getLineNumber(selectionStartOffset)+1;
+        //int methodEndingLine = Integer.parseInt(Messages.showInputDialog("Method End Line Number", "Title", null));
+        int methodEndingLine = document.getLineNumber(selectionEndOffset)+1;
         String currentFileName = psiFile.getName();
         currentFileName = currentFileName.substring(0, currentFileName.length()-5); //remove .java
         String currentProjectName = project.getName();
@@ -299,10 +307,6 @@ public class ASIAAction extends AnAction
 
 
 
-        final SelectionModel selectionModel = editor.getSelectionModel();
-        int selectionStartOffset = selectionModel.getSelectionStart();
-        int selectionEndOffset = selectionModel.getSelectionEnd();
-        editor.getSelectionModel().removeSelection();
 
         PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
         PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
@@ -622,7 +626,7 @@ public class ASIAAction extends AnAction
     {
         PsiElement[] meaningfulElements = PsiTreeUtil.collectElements(e, new PsiElementFilter() {
             public boolean isAccepted(PsiElement e) {
-                if(isAMinumumMeaningfullNode(e)==true)
+                if(isAMinumumMeaningfullNode(e)==true && e instanceof PsiCodeBlock==false && e instanceof PsiBlockStatement==false)
                     return true;
                 return false;
             }

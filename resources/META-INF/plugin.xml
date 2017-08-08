@@ -38,7 +38,7 @@
     <action id="launchASIA" class="com.reveal.asia.ASIAAction" text="launch ASIA"
             description="This will launch ASIA plugin">
       <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="alt DEAD_ACUTE"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="shift meta A"/>
     </action>
   </actions>
 
