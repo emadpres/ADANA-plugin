@@ -1,5 +1,6 @@
 package com.reveal.asia;
 
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
@@ -9,11 +10,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.popup.*;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.CompositePsiElement;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiElementFilter;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
+import com.intellij.util.indexing.FileBasedIndex;
 import groovy.swing.factory.DialogFactory;
 
 import javax.swing.*;
@@ -36,6 +41,7 @@ public class ASIAAction extends AnAction
     int MAX_ACCEPTABLE_NOISE = 1;
     ///////////////////////////////
     public Editor editor = null;
+    private Project project = null;
     PsiElement lowestCommonAncestorPsiElement = null;
     PsiElement firstLowestSameLevelPsiElement=null,secondLowestSameLevelPsiElement=null;
     ///////
@@ -139,11 +145,9 @@ public class ASIAAction extends AnAction
         return e;
     }
 
-    private Pair<PsiElement, PsiElement> getPsiElementByLineNumber(int startingLine, int endingLine, AnActionEvent e)
+    private Pair<PsiElement, PsiElement> getPsiElementByLineNumber(int startingLine, int endingLine, PsiFile psiFile)
     {
-        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
-        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
-        final Document document = editor.getDocument(); //Access document, caret, and selection
+        Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
 
 
         startingLine--;
@@ -190,9 +194,9 @@ public class ASIAAction extends AnAction
         }
     }
 
-    private String getMethodNameFromLineNumber(int methodStartingLineNumber, AnActionEvent e)
+    private String getMethodNameFromLineNumber(int methodStartingLineNumber, PsiFile psiFile)
     {
-        Pair<PsiElement,PsiElement> p  = getPsiElementByLineNumber(methodStartingLineNumber, methodStartingLineNumber, e);
+        Pair<PsiElement,PsiElement> p  = getPsiElementByLineNumber(methodStartingLineNumber, methodStartingLineNumber, psiFile);
         PsiElement m = p.first;
         while(m.getParent() instanceof PsiClass==false) //This PsiClass might be different from "topLevelClass" in above line. It could refer to an inner class.
             m = m.getParent();
@@ -203,7 +207,7 @@ public class ASIAAction extends AnAction
             return ((PsiMethod)m).getName();
     }
 
-    private void processMethod(int methodStartingLine, int methodEndingLine, AnActionEvent e, String currentProjectName, String currentFileName, String currentMethodName)
+    private void processMethod(int methodStartingLine, int methodEndingLine, PsiFile psiFile, String currentProjectName, String currentFileName, String currentMethodName)
     {
         final int L_MIN = 3, L_MAX = 20;
         //if(methodEndingLine-methodStartingLine+1 < L_MIN )
@@ -235,7 +239,7 @@ public class ASIAAction extends AnAction
             for(int window_start = methodStartingLine; window_start<=methodEndingLine; window_start++)
             {
                 int window_end = Math.min(window_start+l-1,methodEndingLine);
-                String expanded_code = processLineRange(window_start, window_end, e);
+                String expanded_code = processLineRange(window_start, window_end, psiFile);
                 if(expanded_code!=null)
                 {
                     String currentLFile = currentMethodFilePrefix +"."+ Integer.toString(thisMethod_thisL_codeIndex) + ".java";
@@ -255,9 +259,9 @@ public class ASIAAction extends AnAction
         return code;
     }
 
-    private String processLineRange(int startingLine, int endingLine, AnActionEvent e)
+    private String processLineRange(int startingLine, int endingLine, PsiFile psiFile)
     {
-        Pair<PsiElement, PsiElement> elementByLineNumber = getPsiElementByLineNumber(startingLine, endingLine, e);
+        Pair<PsiElement, PsiElement> elementByLineNumber = getPsiElementByLineNumber(startingLine, endingLine, psiFile);
         PsiElement selectionStartPsiElement = elementByLineNumber.first;
         PsiElement selectionEndPsiElement = elementByLineNumber.second;
         Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
@@ -288,11 +292,70 @@ public class ASIAAction extends AnAction
     @Override
     public void actionPerformed(AnActionEvent e)
     {
+        editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        project = e.getRequiredData(CommonDataKeys.PROJECT);
+        String currentProjectName = project.getName();
+
+        for (VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project)))
+        {
+            PsiJavaFile aPsiFile = (PsiJavaFile)PsiManager.getInstance(project).findFile(virtualFile);
+            Document document = PsiDocumentManager.getInstance(project).getDocument(aPsiFile);
+
+            String currentFileName = aPsiFile.getName();
+            currentFileName = currentFileName.substring(0, currentFileName.length()-5); //remove .java
+            if(currentFileName.endsWith("Test"))
+                continue;
+
+            final PsiClass[] classes = aPsiFile.getClasses();
+
+
+
+            for(int cIndex = 0 ; cIndex<classes.length; cIndex++)
+            {
+                PsiElement[] allMethods = PsiTreeUtil.collectElements(classes[cIndex], new PsiElementFilter() {
+                    public boolean isAccepted(PsiElement e) {
+                        if(e instanceof PsiMethod && e.getParent() instanceof PsiClass && e.getParent() instanceof PsiAnonymousClass==false)
+                            return true;
+                        return false;
+                    }
+                });
+
+                for(int m=0; m<allMethods.length;m++)
+                {
+
+                    PsiMethod mm = (PsiMethod)allMethods[m];
+                    String currentMethodName = mm.getName();
+                    System.out.print(">"+currentFileName+">"+currentMethodName);
+
+
+
+                    PsiCodeBlock methodBody = mm.getBody();
+                    if(methodBody==null)
+                        continue;//Method Signature Declaration only.
+                    PsiElement lB = methodBody.getLBrace();
+                    PsiElement rB = methodBody.getRBrace();
+                    int methodStartingLine = document.getLineNumber(lB.getTextOffset())+1;
+                    methodStartingLine++;
+                    int methodEndingLine = document.getLineNumber(rB.getTextOffset())+1;
+                    methodEndingLine--;
+
+                    if(methodEndingLine<methodStartingLine) continue;
+                    System.out.print(">"+methodStartingLine+":"+methodEndingLine+"\n");
+
+                    processMethod(methodStartingLine, methodEndingLine, aPsiFile, currentProjectName, currentFileName, currentMethodName);
+                }
+            }
+        }
+    }
+
+
+    public void actionPerformed2(AnActionEvent e)
+    {
         listOfStronglyRelatedPsiElements = null;
 
         //Get all the required data from data keys
         editor = e.getRequiredData(CommonDataKeys.EDITOR);
-        final Project project = e.getRequiredData(CommonDataKeys.PROJECT);
+        project = e.getRequiredData(CommonDataKeys.PROJECT);
         PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
         final Document document = editor.getDocument(); //Access document, caret, and selection
 
@@ -312,10 +375,15 @@ public class ASIAAction extends AnAction
         String currentFileName = psiFile.getName();
         currentFileName = currentFileName.substring(0, currentFileName.length()-5); //remove .java
         String currentProjectName = project.getName();
-        String currentMethodName = getMethodNameFromLineNumber(methodStartingLine, e);
+        String currentMethodName = getMethodNameFromLineNumber(methodStartingLine, psiFile);
         if(currentMethodName==null)
             currentMethodName = Messages.showInputDialog("Can't recognize Method name. Enter:", "Title", null);
-        processMethod(methodStartingLine, methodEndingLine, e, currentProjectName, currentFileName, currentMethodName);
+        if(currentMethodName.equals(""))
+        {
+            Messages.showInfoMessage("Ignored !", "FYI");
+            return;
+        }
+        processMethod(methodStartingLine, methodEndingLine, psiFile, currentProjectName, currentFileName, currentMethodName);
         if(true)
             return;
 
@@ -885,7 +953,7 @@ public class ASIAAction extends AnAction
 
         int offset = editor.getCaretModel().getOffset();
         PsiElement elementAt = psiFile.findElementAt(offset);
-        PsiClass psiClass = PsiTreeUtil.getParentOfType(elementAt, PsiClass.class);
+        PsiClass psiClass = PsiTreeUtil.getTopmostParentOfType(elementAt, PsiClass.class);
         return psiClass;
     }
 }
