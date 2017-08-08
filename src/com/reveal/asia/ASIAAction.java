@@ -209,8 +209,22 @@ public class ASIAAction extends AnAction
         //if(methodEndingLine-methodStartingLine+1 < L_MIN )
         //    return; //Comment: because we consider "nLines" for sliding window. the fact a expanded part has enough statement will be calculated using AST.
 
-        String currentLFolder = "";
+        String currentLFolder = "/Users/emadpres/IdeaProjects/expandedCode/L";
+
         String currentMethodFilePrefix = currentFileName+"."+currentMethodName;
+
+        File checkFileExists = new File("/Users/emadpres/IdeaProjects/expandedCode/L20/"+currentProjectName+"/"+currentMethodFilePrefix+".0.java");
+        if(checkFileExists.exists())
+        {
+            int avoidingDuplicateMethodNameInSameClassSuffixNumber = -1;
+            do
+            {
+                avoidingDuplicateMethodNameInSameClassSuffixNumber++;
+                checkFileExists = new File("/Users/emadpres/IdeaProjects/expandedCode/L20/"+currentProjectName+"/"+currentMethodFilePrefix+"_"+Integer.toString(avoidingDuplicateMethodNameInSameClassSuffixNumber)+".0.java");
+            }while(checkFileExists.exists());
+            currentMethodFilePrefix = currentMethodFilePrefix+"_"+Integer.toString(avoidingDuplicateMethodNameInSameClassSuffixNumber);
+        }
+
 
 
         for(int l=L_MIN; l<=L_MAX; l++)
