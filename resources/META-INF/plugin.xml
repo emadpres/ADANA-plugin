@@ -40,6 +40,9 @@
       <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
       <keyboard-shortcut keymap="$default" first-keystroke="shift meta A"/>
     </action>
+    <action id="RemoveCommentsAction" class="com.reveal.asia.RemoveCommentsAction" text="RemoveCommentsAction">
+      <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
+    </action>
   </actions>
 
 

@@ -179,7 +179,7 @@ public class ASIAAction extends AnAction
             File logFile = new File(filename);
 
             // This will output the full path where the file will be written to...
-            System.out.println(logFile.getCanonicalPath());
+            //System.out.println(logFile.getCanonicalPath());
 
             writer = new BufferedWriter(new FileWriter(logFile));
             writer.write(content);
@@ -298,8 +298,13 @@ public class ASIAAction extends AnAction
 
         for (VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project)))
         {
+            if(virtualFile.getExtension()==null || !virtualFile.getExtension().equals("java"))
+                continue;
             PsiJavaFile aPsiFile = (PsiJavaFile)PsiManager.getInstance(project).findFile(virtualFile);
+            if(aPsiFile==null)
+                continue;
             Document document = PsiDocumentManager.getInstance(project).getDocument(aPsiFile);
+
 
             String currentFileName = aPsiFile.getName();
             currentFileName = currentFileName.substring(0, currentFileName.length()-5); //remove .java
@@ -325,7 +330,7 @@ public class ASIAAction extends AnAction
 
                     PsiMethod mm = (PsiMethod)allMethods[m];
                     String currentMethodName = mm.getName();
-                    System.out.print(">"+currentFileName+">"+currentMethodName);
+                    //System.out.print(">"+currentFileName+">"+currentMethodName);
 
 
 
@@ -340,12 +345,15 @@ public class ASIAAction extends AnAction
                     methodEndingLine--;
 
                     if(methodEndingLine<methodStartingLine) continue;
-                    System.out.print(">"+methodStartingLine+":"+methodEndingLine+"\n");
+                    //System.out.print(">"+methodStartingLine+":"+methodEndingLine+"\n");
 
                     processMethod(methodStartingLine, methodEndingLine, aPsiFile, currentProjectName, currentFileName, currentMethodName);
                 }
             }
         }
+
+        Messages.showInfoMessage(project,"Process Done!", "Done!");
+
     }
 
 
@@ -411,7 +419,7 @@ public class ASIAAction extends AnAction
         if(thresholds.size()==0)
         {
             // Not enough code is selected.
-            System.out.print("Not enough code is selected.");
+            //System.out.print("Not enough code is selected.");
             return;
         }
 
@@ -439,7 +447,7 @@ public class ASIAAction extends AnAction
     {
         if(firstLowestSameLevelPsiElement==null || secondLowestSameLevelPsiElement==null)
         {
-            System.out.print("starting or ending statement is null");
+            //System.out.print("starting or ending statement is null");
             return true;
         }
 
@@ -531,7 +539,7 @@ public class ASIAAction extends AnAction
         else
         {
             listOfStronglyRelatedPsiElements = null;
-            System.out.print("Starting or Ending PsiElement is null");
+            //System.out.print("Starting or Ending PsiElement is null");
         }
 
 
