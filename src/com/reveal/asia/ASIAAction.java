@@ -289,8 +289,8 @@ public class ASIAAction extends AnAction
     }
 
 
-    @Override
-    public void actionPerformed(AnActionEvent e)
+
+    public void actionPerformed2(AnActionEvent e)
     {
         editor = e.getRequiredData(CommonDataKeys.EDITOR);
         project = e.getRequiredData(CommonDataKeys.PROJECT);
@@ -356,8 +356,8 @@ public class ASIAAction extends AnAction
 
     }
 
-
-    public void actionPerformed2(AnActionEvent e)
+    @Override
+    public void actionPerformed(AnActionEvent e)
     {
         listOfStronglyRelatedPsiElements = null;
 
@@ -365,7 +365,6 @@ public class ASIAAction extends AnAction
         editor = e.getRequiredData(CommonDataKeys.EDITOR);
         project = e.getRequiredData(CommonDataKeys.PROJECT);
         PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
-        final Document document = editor.getDocument(); //Access document, caret, and selection
 
 
 
@@ -375,34 +374,11 @@ public class ASIAAction extends AnAction
         editor.getSelectionModel().removeSelection();
 
 
-
-        //int methodStartingLine = Integer.parseInt(Messages.showInputDialog("Method Start Line Number", "Title", null));
-        int methodStartingLine = document.getLineNumber(selectionStartOffset)+1;
-        //int methodEndingLine = Integer.parseInt(Messages.showInputDialog("Method End Line Number", "Title", null));
-        int methodEndingLine = document.getLineNumber(selectionEndOffset)+1;
-        String currentFileName = psiFile.getName();
-        currentFileName = currentFileName.substring(0, currentFileName.length()-5); //remove .java
-        String currentProjectName = project.getName();
-        String currentMethodName = getMethodNameFromLineNumber(methodStartingLine, psiFile);
-        if(currentMethodName==null)
-            currentMethodName = Messages.showInputDialog("Can't recognize Method name. Enter:", "Title", null);
-        if(currentMethodName.equals(""))
-        {
-            Messages.showInfoMessage("Ignored !", "FYI");
-            return;
-        }
-        processMethod(methodStartingLine, methodEndingLine, psiFile, currentProjectName, currentFileName, currentMethodName);
-        if(true)
-            return;
-
-
-
-
         PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
         PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
 
 
-        lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
+        //lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
 
         clearAllHighlightRange();
 

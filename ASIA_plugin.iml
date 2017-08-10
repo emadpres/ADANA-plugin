@@ -10,5 +10,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="json-20170516" level="project" />
+    <orderEntry type="library" name="metric_calculator" level="project" />
   </component>
 </module>
