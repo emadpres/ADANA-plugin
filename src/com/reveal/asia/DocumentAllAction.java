@@ -53,7 +53,7 @@ public class DocumentAllAction extends AnAction
             {
                 EditorHighlightHelper.highlightAllDiscoveredCodeSnippet(editor.getMarkupModel(), listOfStronglyRelatedPsiElements, false);
                 boolean foundAny = false;
-                //TODO foundAny = MyDocumenter.getInstance().fetchDescriptions(listOfStronglyRelatedPsiElements);
+                //TODO foundAny = MyDocumenter.getInstance().retrieveAndAddDescriptions(listOfStronglyRelatedPsiElements);
                 if(foundAny)
                 {
                     String codeWithoutComment = "";

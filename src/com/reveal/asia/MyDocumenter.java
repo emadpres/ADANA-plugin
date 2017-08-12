@@ -108,29 +108,27 @@ public class MyDocumenter
         return listOfStronglyRelatedPsiElements;
     }
 
-    public boolean fetchDescriptions(ArrayList<StronglyRelatedPsiElements> listOfStronglyRelatedPsiElements)
+    public boolean retrieveAndAddDescriptions(ArrayList<StronglyRelatedPsiElements> listOfStronglyRelatedPsiElements)
     {
         if(listOfStronglyRelatedPsiElements==null || listOfStronglyRelatedPsiElements.size()==0)
             return false;
-
-        boolean anyCommentFound = false;
 
         ArrayList<Pair<String, StronglyRelatedPsiElements>> retrievedDescriptions  = new ArrayList<>();
 
         for(int g=0;g<listOfStronglyRelatedPsiElements.size();g++)
         {
             StronglyRelatedPsiElements s = listOfStronglyRelatedPsiElements.get(g);
-            s.fetchDescription();
-            String retrievedCodeDescription = s.getRetrievedCodeDescription();
-            if(retrievedCodeDescription!="")
+            boolean successful = s.retrieveDescription();
+            if(successful)
             {
+                String retrievedCodeDescription = s.getRetrievedCodeDescription();
                 int duplicateIndex = -1;
                 boolean preferMySelf = true;
                 for(int i=0; i<retrievedDescriptions.size(); i++)
                 {
                     if(retrievedDescriptions.get(i).getFirst().equals(retrievedCodeDescription))
                     {
-                        //Duplicate. Perfer the one with lower nested level.
+                        //Duplicate. Prefer the one with lower nested level.
                         duplicateIndex = i;
                         if(s.getNestedLevel()>retrievedDescriptions.get(i).getSecond().getNestedLevel())
                         {
@@ -174,15 +172,12 @@ public class MyDocumenter
                 s.addCommentPsiElement();
         }
 
-        //String codeWithoutComment = listOfStronglyRelatedPsiElements.get(0).convertPsiElementsToText();
-        //codeWithoutComment=""
-
         return (retrievedDescriptions.size()!=0);
     }
 
     public void getDescriptionsAndHighlightAny(ArrayList<StronglyRelatedPsiElements> listOfStronglyRelatedPsiElements, MarkupModel documentMarkupModel)
     {
-        boolean anyFound = fetchDescriptions(listOfStronglyRelatedPsiElements);
+        boolean anyFound = retrieveAndAddDescriptions(listOfStronglyRelatedPsiElements);
         if(!anyFound)
         {
             EditorHighlightHelper.clearAllHighlightRange(documentMarkupModel);

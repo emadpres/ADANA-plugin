@@ -139,7 +139,7 @@ class StronglyRelatedPsiElements
         removeAddedCommentPsiElement();
     }
 
-    public void fetchDescription()
+    public boolean retrieveDescription()
     {
         String serverRes = getServerResult();
 
@@ -187,6 +187,11 @@ class StronglyRelatedPsiElements
             else
                 retrievedCodeDescription = "";//"--->>> No Description Found <<<----"+"\t\t--Received Code:"+serverSideReceivedCode;
         }
+
+        if(retrievedCodeDescription=="")
+            return false;
+        else
+            return true;
 
     }
 

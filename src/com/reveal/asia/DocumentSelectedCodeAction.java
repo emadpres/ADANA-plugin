@@ -67,6 +67,106 @@ public class DocumentSelectedCodeAction extends AnAction
     public JBPopup sliderPopup  = null;
     /////// UI --
 
+    @Override
+    public void actionPerformed(AnActionEvent e)
+    {
+
+        editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        project = e.getRequiredData(CommonDataKeys.PROJECT);
+        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
+
+
+        listOfStronglyRelatedPsiElements = null;
+
+        final SelectionModel selectionModel = editor.getSelectionModel();
+        int selectionStartOffset = selectionModel.getSelectionStart();
+        int selectionEndOffset = selectionModel.getSelectionEnd();
+        editor.getSelectionModel().removeSelection();
+
+
+        PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
+        PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
+
+
+        //lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
+
+        EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
+
+
+        Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
+        firstLowestSameLevelPsiElement = pair.first;
+        secondLowestSameLevelPsiElement = pair.second;
+
+        //showStartingEndingParentOfSelection();
+
+
+        listOfStronglyRelatedPsiElements = MyDocumenter.getInstance().breakdownScopes(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement, MyDocumenter.FIRST_NESTED_LEVEL_INDEX, MyDocumenter.INF_NESTED);
+        if(listOfStronglyRelatedPsiElements==null || listOfStronglyRelatedPsiElements.size()==0)
+        {
+            OddsAndEnds.showInfoBalloon("ADANA Plugin", "Not enough code is selected.");
+            return;
+        }
+
+        int maxNestedLevelInSelectedCode = MyDocumenter.FIRST_NESTED_LEVEL_INDEX;
+        for(int i=0; i<listOfStronglyRelatedPsiElements.size();i++)
+            if(listOfStronglyRelatedPsiElements.get(i).getNestedLevel()>maxNestedLevelInSelectedCode)
+                maxNestedLevelInSelectedCode = listOfStronglyRelatedPsiElements.get(i).getNestedLevel();
+
+
+        JPanel granularitySliderPanel = new GranularitySliderPanel(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement,this, maxNestedLevelInSelectedCode, editor.getMarkupModel());
+        ComponentPopupBuilder componentPopupBuilder = JBPopupFactory.getInstance().createComponentPopupBuilder(granularitySliderPanel, null);
+        sliderPopup = componentPopupBuilder.createPopup();
+
+        sliderPopup.showInFocusCenter();
+        sliderPopup.addListener(new JBPopupListener()
+        {
+            @Override
+            public void beforeShown(LightweightWindowEvent lightweightWindowEvent)
+            {
+
+            }
+
+            @Override
+            public void onClosed(LightweightWindowEvent lightweightWindowEvent)
+            {
+                if(listOfStronglyRelatedPsiElements==null)
+                    EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
+            }
+        });
+
+
+
+        if(true)
+            return;
+
+
+        ArrayList<Integer> thresholds = preProcessBreakDownWithDifferentThresholds();
+        if(thresholds.size()==0)
+        {
+            // Not enough code is selected.
+            //System.out.print("Not enough code is selected.");
+            return;
+        }
+
+        /*JPanel  granularitySliderPanel = new GranularitySliderPanel(this, thresholds);
+        sliderPopup = JBPopupFactory.getInstance().createComponentPopupBuilder(granularitySliderPanel, null).setAlpha(0.5f) .createPopup();
+        sliderPopup.showInFocusCenter();
+        sliderPopup.addListener(new JBPopupListener()
+                                {
+                                    @Override
+                                    public void beforeShown(LightweightWindowEvent lightweightWindowEvent)
+                                    {
+
+                                    }
+
+                                    @Override
+                                    public void onClosed(LightweightWindowEvent lightweightWindowEvent)
+                                    {
+                                        if(listOfStronglyRelatedPsiElements==null)
+                                            EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
+                                    }
+                                });*/
+    }
 
     private boolean isAncestor(PsiElement target, PsiElement supposalAncestor)
     {
@@ -99,8 +199,6 @@ public class DocumentSelectedCodeAction extends AnAction
 
         return supposalLCA;
     }
-
-
 
     private Pair<PsiElement, PsiElement> findLowestSameLevelStatement(PsiElement selectionStartPsiElement, PsiElement selectionEndPsiElement)
     {
@@ -180,7 +278,6 @@ public class DocumentSelectedCodeAction extends AnAction
         return new Pair<>(selectionStartPsiElement, selectionEndPsiElement);
 
     }
-
 
     private String getMethodNameFromLineNumber(int methodStartingLineNumber, PsiFile psiFile)
     {
@@ -329,108 +426,6 @@ public class DocumentSelectedCodeAction extends AnAction
 
     }
 
-
-    @Override
-    public void actionPerformed(AnActionEvent e)
-    {
-
-        editor = e.getRequiredData(CommonDataKeys.EDITOR);
-        project = e.getRequiredData(CommonDataKeys.PROJECT);
-        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
-
-
-        listOfStronglyRelatedPsiElements = null;
-
-        final SelectionModel selectionModel = editor.getSelectionModel();
-        int selectionStartOffset = selectionModel.getSelectionStart();
-        int selectionEndOffset = selectionModel.getSelectionEnd();
-        editor.getSelectionModel().removeSelection();
-
-
-        PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
-        PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
-
-
-        //lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
-
-        EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
-
-
-        Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
-        firstLowestSameLevelPsiElement = pair.first;
-        secondLowestSameLevelPsiElement = pair.second;
-
-        //showStartingEndingParentOfSelection();
-
-
-        listOfStronglyRelatedPsiElements = MyDocumenter.getInstance().breakdownScopes(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement, MyDocumenter.FIRST_NESTED_LEVEL_INDEX, MyDocumenter.INF_NESTED);
-        if(listOfStronglyRelatedPsiElements==null || listOfStronglyRelatedPsiElements.size()==0)
-        {
-            OddsAndEnds.showInfoBalloon("ADANA Plugin", "Not enough code is selected.");
-            return;
-        }
-
-        int maxNestedLevelInSelectedCode = MyDocumenter.FIRST_NESTED_LEVEL_INDEX;
-        for(int i=0; i<listOfStronglyRelatedPsiElements.size();i++)
-            if(listOfStronglyRelatedPsiElements.get(i).getNestedLevel()>maxNestedLevelInSelectedCode)
-                maxNestedLevelInSelectedCode = listOfStronglyRelatedPsiElements.get(i).getNestedLevel();
-
-
-        JPanel granularitySliderPanel = new GranularitySliderPanel(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement,this, maxNestedLevelInSelectedCode, editor.getMarkupModel());
-        ComponentPopupBuilder componentPopupBuilder = JBPopupFactory.getInstance().createComponentPopupBuilder(granularitySliderPanel, null);
-        sliderPopup = componentPopupBuilder.createPopup();
-
-        sliderPopup.showInFocusCenter();
-        sliderPopup.addListener(new JBPopupListener()
-        {
-            @Override
-            public void beforeShown(LightweightWindowEvent lightweightWindowEvent)
-            {
-
-            }
-
-            @Override
-            public void onClosed(LightweightWindowEvent lightweightWindowEvent)
-            {
-                if(listOfStronglyRelatedPsiElements==null)
-                    EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
-            }
-        });
-
-
-
-        if(true)
-            return;
-
-
-        ArrayList<Integer> thresholds = preProcessBreakDownWithDifferentThresholds();
-        if(thresholds.size()==0)
-        {
-            // Not enough code is selected.
-            //System.out.print("Not enough code is selected.");
-            return;
-        }
-
-        /*JPanel  granularitySliderPanel = new GranularitySliderPanel(this, thresholds);
-        sliderPopup = JBPopupFactory.getInstance().createComponentPopupBuilder(granularitySliderPanel, null).setAlpha(0.5f) .createPopup();
-        sliderPopup.showInFocusCenter();
-        sliderPopup.addListener(new JBPopupListener()
-                                {
-                                    @Override
-                                    public void beforeShown(LightweightWindowEvent lightweightWindowEvent)
-                                    {
-
-                                    }
-
-                                    @Override
-                                    public void onClosed(LightweightWindowEvent lightweightWindowEvent)
-                                    {
-                                        if(listOfStronglyRelatedPsiElements==null)
-                                            EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
-                                    }
-                                });*/
-    }
-
     private boolean showStartingEndingParentOfSelection()
     {
         if(firstLowestSameLevelPsiElement==null || secondLowestSameLevelPsiElement==null)
@@ -460,8 +455,6 @@ public class DocumentSelectedCodeAction extends AnAction
             EditorHighlightHelper.highlightRange(editor.getMarkupModel(), parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.CYAN);
         return false;
     }
-
-
 
     private boolean isEquals_TwoStronglyRelatedPsiElementsArrayList(ArrayList<StronglyRelatedPsiElements> a, ArrayList<StronglyRelatedPsiElements> b)
     {
@@ -535,23 +528,16 @@ public class DocumentSelectedCodeAction extends AnAction
         }*/
     }
 
-
-
     public void createCodeDescriptionPopup(StronglyRelatedPsiElements s)
     {
         CodeDescriptionPopup c = new CodeDescriptionPopup(s, this);
         c.getComponent().showInBestPositionFor(editor);
     }
 
-
-
     private ArrayList<StronglyRelatedPsiElements> breakDownPsiElementToRelatedParts(PsiCodeBlock _psiCodeBlock, int nestedLevel, int maxAccetableVariableDistance)
     {
         return breakDownPsiElementToRelatedParts(_psiCodeBlock.getFirstBodyElement(), _psiCodeBlock.getLastBodyElement(), nestedLevel, maxAccetableVariableDistance);
     }
-
-
-
 
     private ArrayList<StronglyRelatedPsiElements> breakDownPsiElementToRelatedParts(PsiElement startingPsiElement, PsiElement endingPsiElement, int nestedLevel, int maxAccetableVariableDistance)
     {
@@ -660,8 +646,6 @@ public class DocumentSelectedCodeAction extends AnAction
             return stronglyRelatedPsiElements;
         }
     }
-
-
 
     private PsiCodeBlock getDirectPsiCodeBlockIfExits(PsiElement element)
     {

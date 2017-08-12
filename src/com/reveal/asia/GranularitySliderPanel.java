@@ -70,7 +70,7 @@ public class GranularitySliderPanel extends JPanel {
 
     private void createOKBtn()
     {
-        sliderConfirmBtn = new JButton("OK");
+        sliderConfirmBtn = new JButton("Retrieve Code Description");
         sliderConfirmBtn.addActionListener(new AbstractAction()
         {
             @Override
