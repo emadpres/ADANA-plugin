@@ -52,7 +52,7 @@ public class DocumentSelectedCodeAction extends AnAction
 
 
     final int MAX_ACCEPTABLE_NOISE = 1;
-
+    final int L_MIN = 3, L_MAX = 20; //for mini-tool
     ///////////////////////////////
     public Editor editor = null;
     private Project project = null;
@@ -292,9 +292,10 @@ public class DocumentSelectedCodeAction extends AnAction
             return ((PsiMethod)m).getName();
     }
 
+
+
     private void processMethod(int methodStartingLine, int methodEndingLine, PsiFile psiFile, String currentProjectName, String currentFileName, String currentMethodName)
     {
-        final int L_MIN = 3, L_MAX = 20;
         //if(methodEndingLine-methodStartingLine+1 < L_MIN )
         //    return; //Comment: because we consider "nLines" for sliding window. the fact a expanded part has enough statement will be calculated using AST.
 
@@ -320,7 +321,6 @@ public class DocumentSelectedCodeAction extends AnAction
         {
             int thisMethod_thisL_codeIndex = 0;
             currentLFolder =  "/Users/emadpres/IdeaProjects/expandedCode/L"+Integer.toString(l)+"/"+currentProjectName+"/";
-            new File(currentLFolder).mkdirs(); //once is enough
             for(int window_start = methodStartingLine; window_start<=methodEndingLine; window_start++)
             {
                 int window_end = Math.min(window_start+l-1,methodEndingLine);
@@ -378,6 +378,12 @@ public class DocumentSelectedCodeAction extends AnAction
         editor = e.getRequiredData(CommonDataKeys.EDITOR);
         project = e.getRequiredData(CommonDataKeys.PROJECT);
         String currentProjectName = project.getName();
+
+        for(int l=L_MIN; l<=L_MAX; l++)
+        {
+            String lFolder = "/Users/emadpres/IdeaProjects/expandedCode/L" + Integer.toString(l) + "/" + currentProjectName + "/";
+            new File(lFolder).mkdirs(); //once is enough
+        }
 
         for (VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project)))
         {

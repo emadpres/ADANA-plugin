@@ -121,7 +121,7 @@ public class MyDocumenter
             boolean successful = s.retrieveDescription();
             if(successful)
             {
-                String retrievedCodeDescription = s.getRetrievedCodeDescription();
+                String retrievedCodeDescription = s.getRetrievedCodeDescriptionFromServer();
                 int duplicateIndex = -1;
                 boolean preferMySelf = true;
                 for(int i=0; i<retrievedDescriptions.size(); i++)
@@ -168,7 +168,7 @@ public class MyDocumenter
         for(int g=0;g<listOfStronglyRelatedPsiElements.size();g++)
         {
             StronglyRelatedPsiElements s = listOfStronglyRelatedPsiElements.get(g);
-            if(s.getRetrievedCodeDescription()!="")
+            if(s.getRetrievedCodeDescriptionFromServer()!="")
                 s.addCommentPsiElement();
         }
 
@@ -184,7 +184,8 @@ public class MyDocumenter
             OddsAndEnds.showInfoBalloon("ADANA Plugin", "Don't be disappointed, but unfortunately no result.");
         }
         else
+        {
             EditorHighlightHelper.highlightAllDiscoveredCodeSnippetIfHasComment(documentMarkupModel, listOfStronglyRelatedPsiElements, true);
+        }
     }
-
 }

@@ -32,7 +32,7 @@ class StronglyRelatedPsiElements
 {
     ArrayList<PsiElement> psiElements = new ArrayList<>();
     ArrayList<PsiElement> newlyAddedComments = new ArrayList<>();
-    String retrievedCodeDescription = "";
+    String retrievedCodeDescriptionFromServer = "";
     //////
     RangeHighlighter rh;
     Color color;
@@ -45,9 +45,33 @@ class StronglyRelatedPsiElements
         psiElements = _elements;
     }
 
-    public String getRetrievedCodeDescription()
+    public String getRetrievedCodeDescriptionFromServer()
     {
-        return retrievedCodeDescription;
+        return retrievedCodeDescriptionFromServer;
+    }
+
+    public String getCodeDescriptionExistsInEditor()
+    {
+        String codeDescriptionExistsInEditor = "";
+        for(int i=0; i<newlyAddedComments.size(); i++)
+        {
+            codeDescriptionExistsInEditor += newlyAddedComments.get(i).getText();
+        }
+        return codeDescriptionExistsInEditor;
+        /* Solution when comments are supposed to change:
+        ---------------------------------------------------
+        ---------------------------------------------------
+         String codeDescriptionExistsInEditor = "";
+        // TODO: newlyAddedComments elements are not valid if comments are changed in editor. By changing in editor,
+        // The PsiElements (in Editor Tree) are replaced with new PsiElements and we don't have reference to them.
+        // Here we do a trick and access changed comment, using valid (because of unchanged) first elements.
+        if(newlyAddedComments.size()==0)
+            return "";
+        codeDescriptionExistsInEditor += psiElements.get(0).getPrevSibling().getPrevSibling().getText()+"\n";
+        return codeDescriptionExistsInEditor;
+        ---------------------------------------------------
+        ---------------------------------------------------
+         */
     }
 
     public String convertPsiElementsToText()
@@ -56,6 +80,15 @@ class StronglyRelatedPsiElements
         for(int i=0;i<psiElements.size();i++)
             code =  code + psiElements.get(i).getText()+"\n";
         return code;
+    }
+
+    public String convertPsiElementsAndCommentRetrievedFromServerToText()
+    {
+        String codeWithComment = "";
+        if(getCodeDescriptionExistsInEditor()!="")
+            codeWithComment += getCodeDescriptionExistsInEditor() + "\n";
+        codeWithComment += convertPsiElementsToText();
+        return codeWithComment;
     }
 
     public void setColor(Color _color)
@@ -83,6 +116,14 @@ class StronglyRelatedPsiElements
         return nestedLevel;
     }
 
+    private String getServerResultLocally()
+    {
+        String code = convertPsiElementsToText();
+        code = code.replace("\n"," ");
+        String response = ASIAWrapper.getInstance().findDescriptions(code);
+        return response;
+    }
+
     private String getServerResult()
     {
 
@@ -90,7 +131,6 @@ class StronglyRelatedPsiElements
         {
             String code = convertPsiElementsToText();
             code = code.replace("\n"," ");
-            //code = code.replace("+", "%2B");
 
             code = URLEncoder.encode(code,"UTF-8");
 
@@ -135,13 +175,13 @@ class StronglyRelatedPsiElements
 
     public void ignoreRetrievedComment()
     {
-        retrievedCodeDescription = "";
+        retrievedCodeDescriptionFromServer = "";
         removeAddedCommentPsiElement();
     }
 
     public boolean retrieveDescription()
     {
-        String serverRes = getServerResult();
+        String serverRes = getServerResultLocally();//getServerResult();
 
 
         JSONObject obj = new JSONObject(serverRes);
@@ -149,7 +189,7 @@ class StronglyRelatedPsiElements
 
         if(resultCode<0)
         {
-            retrievedCodeDescription = "";//"--->>> ERROR: "+obj.getString("errorDescription");
+            retrievedCodeDescriptionFromServer = "";//"--->>> ERROR: "+obj.getString("errorDescription");
         }
         else
         {
@@ -165,7 +205,7 @@ class StronglyRelatedPsiElements
                     JSONObject jsonObject = retrievedCloneDescriptions.getJSONObject(0);
                     String description = jsonObject.getString("description");
                     Double ASIA_similarity = jsonObject.getDouble("sim");
-                    retrievedCodeDescription = description;//+ "\t\t--Received Code:" + serverSideReceivedCode;
+                    retrievedCodeDescriptionFromServer = description;//+ "\t\t--Received Code:" + serverSideReceivedCode;
                 }
                 else
                 {
@@ -180,15 +220,15 @@ class StronglyRelatedPsiElements
 
                     DescriptionRanker ranker = new DescriptionRanker(convertPsiElementsToText(), allRetrievedCodeDescription);
                     String bestDescription = ranker.getBestDescription();
-                    retrievedCodeDescription = bestDescription;//+ "\t\t--Received Code:" + serverSideReceivedCode;
+                    retrievedCodeDescriptionFromServer = bestDescription;//+ "\t\t--Received Code:" + serverSideReceivedCode;
                 }
 
             }
             else
-                retrievedCodeDescription = "";//"--->>> No Description Found <<<----"+"\t\t--Received Code:"+serverSideReceivedCode;
+                retrievedCodeDescriptionFromServer = "";//"--->>> No Description Found <<<----"+"\t\t--Received Code:"+serverSideReceivedCode;
         }
 
-        if(retrievedCodeDescription=="")
+        if(retrievedCodeDescriptionFromServer =="")
             return false;
         else
             return true;
@@ -197,7 +237,7 @@ class StronglyRelatedPsiElements
 
     public void addCommentPsiElement()
     {
-        if(retrievedCodeDescription=="")
+        if(retrievedCodeDescriptionFromServer =="")
             return;
 
         PsiElement firstPsiElement ;
@@ -213,14 +253,15 @@ class StronglyRelatedPsiElements
             @Override
             protected void run() throws Throwable
             {
-                String[] commentStrs = retrievedCodeDescription.split("\n");
+                String[] commentStrs = retrievedCodeDescriptionFromServer.split("\n");
                 int asas=0;
 
                 for(int i=0;i<commentStrs.length;i++)
                 {
                     String commentToInsert = "// "+commentStrs[i];
                     PsiComment commentFromText = JavaPsiFacade.getElementFactory(getProject()).createCommentFromText(commentToInsert, firstPsiElement);
-                    newlyAddedComments.add(firstPsiElement.getParent().addBefore(commentFromText, firstPsiElement));
+                    PsiElement newlyAddedInEditor = firstPsiElement.getParent().addBefore(commentFromText, firstPsiElement);
+                    newlyAddedComments.add(newlyAddedInEditor);
                 }
             }
 
@@ -299,7 +340,7 @@ class StronglyRelatedPsiElements
 
                         };
 
-                        AnAction discardAction  = new AnAction("Discard", "Remove Comment.", Icons.DELETE_ICON)
+                        AnAction discardAction  = new AnAction("Discard", "Discard Comment.", Icons.DELETE_ICON)
                         {
                             @Override
                             public void actionPerformed(AnActionEvent anActionEvent)
