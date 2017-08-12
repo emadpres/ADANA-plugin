@@ -15,16 +15,16 @@ import java.awt.event.ActionListener;
 public class CodeDescriptionPopup
 {
     StronglyRelatedPsiElements associatedSRPE;
-    ASIAAction asiaAction;
+    DocumentSelectedCodeAction documentSelectedCodeAction;
     JBPopup component;
     //////// UI
     JTextArea editableCodeDescription;
     JButton confirmDocumentation;
 
-    public CodeDescriptionPopup(StronglyRelatedPsiElements _associatedSRPE, ASIAAction _asiaAction)
+    public CodeDescriptionPopup(StronglyRelatedPsiElements _associatedSRPE, DocumentSelectedCodeAction _documentSelectedCodeAction)
     {
         associatedSRPE = _associatedSRPE;
-        asiaAction = _asiaAction;
+        documentSelectedCodeAction = _documentSelectedCodeAction;
         createJBPopup();
     }
 
@@ -70,7 +70,7 @@ public class CodeDescriptionPopup
             public void actionPerformed(ActionEvent e)
             {
                 String txt = editableCodeDescription.getText();
-                asiaAction.generareComment(CodeDescriptionPopup.this.associatedSRPE,"// "+txt);
+                documentSelectedCodeAction.generareComment(CodeDescriptionPopup.this.associatedSRPE,"// "+txt);
                 CodeDescriptionPopup.this.component.cancel();
             }
         });

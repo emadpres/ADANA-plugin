@@ -35,7 +35,7 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="launchASIA" class="com.reveal.asia.ASIAAction" text="Document Selected Code"
+    <action id="launchASIA" class="com.reveal.asia.DocumentSelectedCodeAction" text="Document Selected Code"
             description="This will launch ASIA plugin">
       <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
       <keyboard-shortcut keymap="$default" first-keystroke="shift meta A"/>

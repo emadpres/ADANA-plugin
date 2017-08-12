@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
@@ -19,17 +18,17 @@ public class GranularitySliderPanel extends JPanel {
     private JSlider breakDownThresholdSlider;
     JButton sliderConfirmBtn;
     MarkupModel documentMarkupModel;
-    ASIAAction asiaAction;
+    DocumentSelectedCodeAction documentSelectedCodeAction;
     PsiElement firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement;
     ArrayList<StronglyRelatedPsiElements> listOfStronglyRelatedPsiElements;
 
-    public GranularitySliderPanel(PsiElement _firstLowestSameLevelPsiElement, PsiElement _secondLowestSameLevelPsiElement, ASIAAction _asiaAction, int _maxNestedLevelInSelectedCode, MarkupModel _documentMarkupModel) {
+    public GranularitySliderPanel(PsiElement _firstLowestSameLevelPsiElement, PsiElement _secondLowestSameLevelPsiElement, DocumentSelectedCodeAction _documentSelectedCodeAction, int _maxNestedLevelInSelectedCode, MarkupModel _documentMarkupModel) {
         super();
         firstLowestSameLevelPsiElement = _firstLowestSameLevelPsiElement;
         secondLowestSameLevelPsiElement = _secondLowestSameLevelPsiElement;
         maxNestedLevelInSelectedCode = _maxNestedLevelInSelectedCode;
         documentMarkupModel = _documentMarkupModel;
-        asiaAction = _asiaAction; //BAD Design
+        documentSelectedCodeAction = _documentSelectedCodeAction; //BAD Design
 
         this.setLayout(new BoxLayout(this , BoxLayout.X_AXIS));
 
@@ -78,7 +77,7 @@ public class GranularitySliderPanel extends JPanel {
             public void actionPerformed(ActionEvent e)
             {
                 MyDocumenter.getInstance().getDescriptionsAndHighlightAny(listOfStronglyRelatedPsiElements, documentMarkupModel);
-                asiaAction.sliderPopup.cancel();
+                documentSelectedCodeAction.sliderPopup.cancel();
             }
 
         });

@@ -46,7 +46,7 @@ import static edu.cmu.lti.jawjaw.pobj.POS.n;
 /**
  * Created by emadpres on 7/25/17.
  */
-public class ASIAAction extends AnAction
+public class DocumentSelectedCodeAction extends AnAction
 {
     /////////////////////////////// CONST
 
@@ -522,9 +522,9 @@ public class ASIAAction extends AnAction
         }
 
 
-        /*if( ASIAAction.this.lowestCommonAncestorPsiElement instanceof PsiCodeBlock)
+        /*if( DocumentSelectedCodeAction.this.lowestCommonAncestorPsiElement instanceof PsiCodeBlock)
         {
-            listOfStronglyRelatedPsiElements = breakDownPsiElementToRelatedParts((PsiCodeBlock) ASIAAction.this.lowestCommonAncestorPsiElement, 0, sliderValue);
+            listOfStronglyRelatedPsiElements = breakDownPsiElementToRelatedParts((PsiCodeBlock) DocumentSelectedCodeAction.this.lowestCommonAncestorPsiElement, 0, sliderValue);
             EditorHighlightHelper.highlightAllDiscoveredCodeSnippet(editor.getMarkupModel(), listOfStronglyRelatedPsiElements, true);
 
         }
