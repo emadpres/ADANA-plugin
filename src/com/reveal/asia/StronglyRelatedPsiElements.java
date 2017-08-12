@@ -30,7 +30,6 @@ import java.util.ArrayList;
  */
 class StronglyRelatedPsiElements
 {
-    ASIAAction asiaAction;
     ArrayList<PsiElement> psiElements = new ArrayList<>();
     ArrayList<PsiElement> newlyAddedComments = new ArrayList<>();
     String retrievedCodeDescription = "";
@@ -40,18 +39,22 @@ class StronglyRelatedPsiElements
     int nestedLevel;
 
 
-    public StronglyRelatedPsiElements(int _nestedLevel, ArrayList<PsiElement> _elements, ASIAAction _asiaAction)
+    public StronglyRelatedPsiElements(int _nestedLevel, ArrayList<PsiElement> _elements)
     {
         nestedLevel = _nestedLevel;
         psiElements = _elements;
-        asiaAction = _asiaAction;
     }
 
-    private String convertPsiElementsToText()
+    public String getRetrievedCodeDescription()
+    {
+        return retrievedCodeDescription;
+    }
+
+    public String convertPsiElementsToText()
     {
         String code = "";
         for(int i=0;i<psiElements.size();i++)
-            code =  code + psiElements.get(i).getText();
+            code =  code + psiElements.get(i).getText()+"\n";
         return code;
     }
 
@@ -60,10 +63,10 @@ class StronglyRelatedPsiElements
         color = _color;
     }
 
-    public void addPsiElement(PsiElement e)
+    /*public void addPsiElement(PsiElement e)
     {
         psiElements.add(e);
-    }
+    }*/
 
     public TextRange getTextRange()
     {
@@ -87,13 +90,17 @@ class StronglyRelatedPsiElements
         {
             String code = convertPsiElementsToText();
             code = code.replace("\n"," ");
-            code = code.replace("+", "%2B");
+            //code = code.replace("+", "%2B");
+
+            code = URLEncoder.encode(code,"UTF-8");
 
             String urlParameters  = "selectedCode="+code;
 
 
             //urlParameters = URLEncoder.encode(urlParameters, "UTF-8");
+
             byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
+
 
             int    postDataLength = postData.length;
             String request        = "http://localhost:8080/ASIAWebApp/MainServlet";
@@ -120,21 +127,29 @@ class StronglyRelatedPsiElements
             return response;
         } catch (IOException e)
         {
+            //OddsAndEnds.showInfoBalloon("ADANA Plugin", "Server connection refused."); //No, we may be in auto-all-document mode and UI sucks.
             e.printStackTrace();
             return String.format("{\"result\": -1, \"errorDescription\":\"%s\" }",e.toString());
         }
+    }
+
+    public void ignoreRetrievedComment()
+    {
+        retrievedCodeDescription = "";
+        removeAddedCommentPsiElement();
     }
 
     public void fetchDescription()
     {
         String serverRes = getServerResult();
 
+
         JSONObject obj = new JSONObject(serverRes);
         int resultCode = obj.getInt("result");
 
         if(resultCode<0)
         {
-            retrievedCodeDescription = "--->>> ERROR: "+obj.getString("errorDescription");
+            retrievedCodeDescription = "";//"--->>> ERROR: "+obj.getString("errorDescription");
         }
         else
         {
@@ -150,7 +165,7 @@ class StronglyRelatedPsiElements
                     JSONObject jsonObject = retrievedCloneDescriptions.getJSONObject(0);
                     String description = jsonObject.getString("description");
                     Double ASIA_similarity = jsonObject.getDouble("sim");
-                    retrievedCodeDescription = description+ "\t\t--Received Code:" + serverSideReceivedCode;
+                    retrievedCodeDescription = description;//+ "\t\t--Received Code:" + serverSideReceivedCode;
                 }
                 else
                 {
@@ -165,18 +180,21 @@ class StronglyRelatedPsiElements
 
                     DescriptionRanker ranker = new DescriptionRanker(convertPsiElementsToText(), allRetrievedCodeDescription);
                     String bestDescription = ranker.getBestDescription();
-                    retrievedCodeDescription = bestDescription+ "\t\t--Received Code:" + serverSideReceivedCode;
+                    retrievedCodeDescription = bestDescription;//+ "\t\t--Received Code:" + serverSideReceivedCode;
                 }
 
             }
             else
-                retrievedCodeDescription = "--->>> No Description Found <<<----"+"\t\t--Received Code:"+serverSideReceivedCode;
+                retrievedCodeDescription = "";//"--->>> No Description Found <<<----"+"\t\t--Received Code:"+serverSideReceivedCode;
         }
 
     }
 
     public void addCommentPsiElement()
     {
+        if(retrievedCodeDescription=="")
+            return;
+
         PsiElement firstPsiElement ;
         if(psiElements.get(0) instanceof PsiCodeBlock)
             firstPsiElement = ((PsiCodeBlock) psiElements.get(0)).getFirstBodyElement().getNextSibling();
@@ -225,10 +243,10 @@ class StronglyRelatedPsiElements
         }.execute();
     }
 
-    public void performHighlighting()
+    public void performHighlighting(MarkupModel documentMarkupModel)
     {
         TextAttributes myTextAtt = new TextAttributes(Color.BLACK, color, Color.BLACK, EffectType.ROUNDED_BOX, Font.ITALIC);
-        rh = asiaAction.editor.getMarkupModel().addRangeHighlighter(getTextRange().getStartOffset(), getTextRange().getEndOffset(), HighlighterLayer.SYNTAX-100+getNestedLevel(), myTextAtt, HighlighterTargetArea.EXACT_RANGE);
+        rh = documentMarkupModel.addRangeHighlighter(getTextRange().getStartOffset(), getTextRange().getEndOffset(), HighlighterLayer.SYNTAX-100+getNestedLevel(), myTextAtt, HighlighterTargetArea.EXACT_RANGE);
 
         rh.setGutterIconRenderer(new GutterIconRenderer()
         {
@@ -270,7 +288,7 @@ class StronglyRelatedPsiElements
                             @Override
                             public void actionPerformed(AnActionEvent anActionEvent)
                             {
-                                asiaAction.editor.getMarkupModel().removeHighlighter(rh);
+                                documentMarkupModel.removeHighlighter(rh);
                             }
 
 
@@ -281,7 +299,7 @@ class StronglyRelatedPsiElements
                             @Override
                             public void actionPerformed(AnActionEvent anActionEvent)
                             {
-                                asiaAction.editor.getMarkupModel().removeHighlighter(rh);
+                                documentMarkupModel.removeHighlighter(rh);
                                 removeAddedCommentPsiElement();
                             }
 

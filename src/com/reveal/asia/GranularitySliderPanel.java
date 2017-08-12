@@ -1,5 +1,8 @@
 package com.reveal.asia;
 
+import com.intellij.openapi.editor.markup.MarkupModel;
+import com.intellij.psi.PsiElement;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -12,31 +15,41 @@ import java.util.ArrayList;
 
 public class GranularitySliderPanel extends JPanel {
 
-    ArrayList<Integer> thresholds;
+    int maxNestedLevelInSelectedCode;
     private JSlider breakDownThresholdSlider;
     JButton sliderConfirmBtn;
+    MarkupModel documentMarkupModel;
     ASIAAction asiaAction;
+    PsiElement firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement;
+    ArrayList<StronglyRelatedPsiElements> listOfStronglyRelatedPsiElements;
 
-
-    public GranularitySliderPanel(ASIAAction _asiaAction, ArrayList<Integer> _thresholds) {
+    public GranularitySliderPanel(PsiElement _firstLowestSameLevelPsiElement, PsiElement _secondLowestSameLevelPsiElement, ASIAAction _asiaAction, int _maxNestedLevelInSelectedCode, MarkupModel _documentMarkupModel) {
         super();
-        thresholds = _thresholds;
+        firstLowestSameLevelPsiElement = _firstLowestSameLevelPsiElement;
+        secondLowestSameLevelPsiElement = _secondLowestSameLevelPsiElement;
+        maxNestedLevelInSelectedCode = _maxNestedLevelInSelectedCode;
+        documentMarkupModel = _documentMarkupModel;
         asiaAction = _asiaAction; //BAD Design
 
         this.setLayout(new BoxLayout(this , BoxLayout.X_AXIS));
 
-        createSlider();
-        this.add(breakDownThresholdSlider);
+        if(maxNestedLevelInSelectedCode!=MyDocumenter.FIRST_NESTED_LEVEL_INDEX)
+        {
+            createSlider();
+            this.add(breakDownThresholdSlider);
+        }
+        else
+            breakDownThresholdSlider = null;
 
         createOKBtn();
         this.add(sliderConfirmBtn);
 
-        asiaAction.tryToBreakDownSelectedCode(asiaAction.WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER);
+        listOfStronglyRelatedPsiElements  = MyDocumenter.getInstance().breakdownAndHighlight(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement, MyDocumenter.FIRST_NESTED_LEVEL_INDEX, documentMarkupModel);
     }
 
     private void createSlider()
     {
-        breakDownThresholdSlider = new TransparentSlider(JSlider.HORIZONTAL, 0, thresholds.size()-1, 0);
+        breakDownThresholdSlider = new TransparentSlider(JSlider.HORIZONTAL, MyDocumenter.FIRST_NESTED_LEVEL_INDEX, maxNestedLevelInSelectedCode, MyDocumenter.FIRST_NESTED_LEVEL_INDEX);
         breakDownThresholdSlider.setSnapToTicks(true);
         breakDownThresholdSlider.setMajorTickSpacing(1);
         breakDownThresholdSlider.setPaintTicks(true);
@@ -48,10 +61,9 @@ public class GranularitySliderPanel extends JPanel {
                 JSlider source = (JSlider)e.getSource();
                 if (!source.getValueIsAdjusting()) {
                     int value = (int)source.getValue();
-                    value = thresholds.get(thresholds.size()-1-value); //Mapping
-                    System.out.print(value);
+                    //System.out.print(value);
                     ////////////
-                    asiaAction.tryToBreakDownSelectedCode(value);
+                    listOfStronglyRelatedPsiElements = MyDocumenter.getInstance().breakdownAndHighlight(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement, value, documentMarkupModel);
                 }
             }
         });
@@ -65,7 +77,7 @@ public class GranularitySliderPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                asiaAction.fetchDescriptions();
+                MyDocumenter.getInstance().getDescriptionsAndHighlightAny(listOfStronglyRelatedPsiElements, documentMarkupModel);
                 asiaAction.sliderPopup.cancel();
             }
 

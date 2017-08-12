@@ -35,14 +35,17 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="launchASIA" class="com.reveal.asia.ASIAAction" text="launch ASIA"
+    <action id="launchASIA" class="com.reveal.asia.ASIAAction" text="Document Selected Code"
             description="This will launch ASIA plugin">
       <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
       <keyboard-shortcut keymap="$default" first-keystroke="shift meta A"/>
     </action>
-    <action id="RemoveCommentsAction" class="com.reveal.asia.RemoveCommentsAction" text="RemoveCommentsAction">
+    <action id="RemoveCommentsAction" class="com.reveal.asia.RemoveCommentsAction" text="Remove All Comments">
       <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
     </action>
+      <action id="DocumentAll" class="com.reveal.asia.DocumentAllAction" text="Document All" description="Document All Methods">
+          <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
+      </action>
   </actions>
 
 
