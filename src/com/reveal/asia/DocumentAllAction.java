@@ -88,7 +88,7 @@ public class DocumentAllAction extends AnAction
                                 avoidingDuplicateMethodNameInSameClassSuffixNumber++;
                                 checkFileExists = new File(path_project+currentFileName+"."+currentMethodName+Integer.toString(avoidingDuplicateMethodNameInSameClassSuffixNumber)+".java");
                             }while(checkFileExists.exists());
-                            currentMethodName = currentMethodName+"_"+Integer.toString(avoidingDuplicateMethodNameInSameClassSuffixNumber);
+                            currentMethodName = currentMethodName+Integer.toString(avoidingDuplicateMethodNameInSameClassSuffixNumber);
                         }
                         ///////////////// Save file
                         String methodPath_withoutSuffix = path_project+currentFileName+"."+currentMethodName;

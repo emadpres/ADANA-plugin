@@ -183,8 +183,25 @@ class StronglyRelatedPsiElements
     {
         String serverRes = getServerResultLocally();//getServerResult();
 
+        JSONObject obj = null;
+        try
+        {
+            obj = new JSONObject(serverRes);
+        }
+        catch (JSONException e)
+        {
+            System.out.print("\n\n--------------- ++JSON++ ----------------\n");
+            System.out.print(serverRes);
+            System.out.print("\n\n--------------- --JSON-- ----------------\n");
+            e.printStackTrace();
+        }
 
-        JSONObject obj = new JSONObject(serverRes);
+        if(obj==null)
+        {
+            retrievedCodeDescriptionFromServer="";
+            return false;
+        }
+
         int resultCode = obj.getInt("result");
 
         if(resultCode<0)
