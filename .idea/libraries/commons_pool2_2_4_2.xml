@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="asia">
+  <library name="commons-pool2-2.4.2">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/asia.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-pool2-2.4.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

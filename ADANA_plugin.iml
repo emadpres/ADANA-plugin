@@ -11,7 +11,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="json-20170516" level="project" />
     <orderEntry type="library" name="metric_calculator" level="project" />
-    <orderEntry type="library" name="asia" level="project" />
     <orderEntry type="library" name="commons-dbcp2-2.1.1" level="project" />
+    <orderEntry type="library" name="commons-pool2-2.4.2" level="project" />
+    <orderEntry type="library" name="mysql-connector-java-5.1.43-bin" level="project" />
   </component>
 </module>
