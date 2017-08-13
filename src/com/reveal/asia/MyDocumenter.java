@@ -118,6 +118,8 @@ public class MyDocumenter
         for(int g=0;g<listOfStronglyRelatedPsiElements.size();g++)
         {
             StronglyRelatedPsiElements s = listOfStronglyRelatedPsiElements.get(g);
+            // Here we retreive comment for each part but we SHOULD NOT add it in editor to the this code until end of this method.
+            // Why? Read retrieveDescription() first line comment on the way we extract code from this StronglyRelatedPsiElements obj.
             boolean successful = s.retrieveDescription();
             if(successful)
             {

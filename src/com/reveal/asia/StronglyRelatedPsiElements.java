@@ -76,6 +76,7 @@ class StronglyRelatedPsiElements
 
     public String convertPsiElementsToText()
     {
+        //Note: The code might include already=-commented subtree code blocks! (if inner parts are annotated with comment in editor)
         String code = "";
         for(int i=0;i<psiElements.size();i++)
             code =  code + psiElements.get(i).getText()+"\n";
@@ -116,7 +117,7 @@ class StronglyRelatedPsiElements
         return nestedLevel;
     }
 
-    private String getServerResultLocally()
+    private String sendCodeToServerAndRetrieveDescriptionsLocally()
     {
         String code = convertPsiElementsToText();
         code = code.replace("\n"," ");
@@ -124,7 +125,7 @@ class StronglyRelatedPsiElements
         return response;
     }
 
-    private String getServerResult()
+    private String sendCodeToServerAndRetrieveDescriptions()
     {
 
         try
@@ -181,7 +182,8 @@ class StronglyRelatedPsiElements
 
     public boolean retrieveDescription()
     {
-        String serverRes = getServerResultLocally();//getServerResult();
+        //Note: The code that we are sending might include already=-commented subtree code blocks! (if inner parts are annotated with comment in editor)
+        String serverRes = sendCodeToServerAndRetrieveDescriptionsLocally();//sendCodeToServerAndRetrieveDescriptions();
 
         JSONObject obj = null;
         try
