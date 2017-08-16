@@ -183,7 +183,8 @@ class StronglyRelatedPsiElements
     public boolean retrieveDescription()
     {
         //Note: The code that we are sending might include already=-commented subtree code blocks! (if inner parts are annotated with comment in editor)
-        String serverRes = sendCodeToServerAndRetrieveDescriptionsLocally();//sendCodeToServerAndRetrieveDescriptions();
+        //String serverRes = sendCodeToServerAndRetrieveDescriptionsLocally();
+        String serverRes = sendCodeToServerAndRetrieveDescriptions();
 
         JSONObject obj = null;
         try
