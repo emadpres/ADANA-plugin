@@ -215,37 +215,7 @@ class StronglyRelatedPsiElements
         {
             String serverSideReceivedCode = obj.getString("selectedCode");
             //serverSideReceivedCode = serverSideReceivedCode.substring(0,Math.min(30,serverSideReceivedCode.length()));
-            /////
-            JSONArray retrievedCloneDescriptions = obj.getJSONArray("retrievedCloneDescriptions");
-
-            if(retrievedCloneDescriptions.length()>0)
-            {
-                if(retrievedCloneDescriptions.length()==1)
-                {
-                    JSONObject jsonObject = retrievedCloneDescriptions.getJSONObject(0);
-                    String description = jsonObject.getString("description");
-                    Double ASIA_similarity = jsonObject.getDouble("sim");
-                    retrievedCodeDescriptionFromServer = description;//+ "\t\t--Received Code:" + serverSideReceivedCode;
-                }
-                else
-                {
-                    ArrayList<Pair<String, Double>> allRetrievedCodeDescription = new ArrayList<>();
-                    for(int i=0; i<retrievedCloneDescriptions.length(); i++)
-                    {
-                        JSONObject jsonObject = retrievedCloneDescriptions.getJSONObject(i);
-                        String description = jsonObject.getString("description");
-                        Double ASIA_similarity = jsonObject.getDouble("sim");
-                        allRetrievedCodeDescription.add(new Pair(description, ASIA_similarity));
-                    }
-
-                    DescriptionRanker ranker = new DescriptionRanker(convertPsiElementsToText(), allRetrievedCodeDescription);
-                    String bestDescription = ranker.getBestDescription();
-                    retrievedCodeDescriptionFromServer = bestDescription;//+ "\t\t--Received Code:" + serverSideReceivedCode;
-                }
-
-            }
-            else
-                retrievedCodeDescriptionFromServer = "";//"--->>> No Description Found <<<----"+"\t\t--Received Code:"+serverSideReceivedCode;
+            retrievedCodeDescriptionFromServer = obj.getString("retrievedCloneDescription");
         }
 
         if(retrievedCodeDescriptionFromServer =="")
