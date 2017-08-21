@@ -1,46 +1,27 @@
 package com.reveal.asia;
 
-import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.ide.highlighter.JavaFileType;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.markup.*;
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.popup.*;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.tree.CompositePsiElement;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiElementFilter;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
-import com.intellij.ui.NotificationBalloonActionProvider;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.sun.jna.platform.win32.LMAccess;
-import groovy.swing.factory.DialogFactory;
-import org.eclipse.core.internal.events.NotificationManager;
-import org.eclipse.jdt.core.dom.Message;
-
-import com.intellij.notification.Notification;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-
-import static edu.cmu.lti.jawjaw.pobj.POS.n;
 
 
 /**
@@ -54,7 +35,6 @@ public class DocumentSelectedCodeAction extends AnAction
     final int MAX_ACCEPTABLE_NOISE = 1;
     final int L_MIN = 3, L_MAX = 20; //for mini-tool
     ///////////////////////////////
-    public Editor editor = null;
     private Project project = null;
     PsiElement lowestCommonAncestorPsiElement = null;
     PsiElement firstLowestSameLevelPsiElement=null,secondLowestSameLevelPsiElement=null;
@@ -71,36 +51,16 @@ public class DocumentSelectedCodeAction extends AnAction
     public void actionPerformed(AnActionEvent e)
     {
 
-        editor = e.getRequiredData(CommonDataKeys.EDITOR);
         project = e.getRequiredData(CommonDataKeys.PROJECT);
-        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
-
-
+        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
         listOfStronglyRelatedPsiElements = null;
 
-        final SelectionModel selectionModel = editor.getSelectionModel();
-        int selectionStartOffset = selectionModel.getSelectionStart();
-        int selectionEndOffset = selectionModel.getSelectionEnd();
+        Pair<PsiElement, PsiElement> pair = GetFirstAndLastPsiElementsInSelectedArea(e);
         editor.getSelectionModel().removeSelection();
-
-
-        PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
-        PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
-
-
-        //lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
-
-        EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
-
-
-        Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
         firstLowestSameLevelPsiElement = pair.first;
         secondLowestSameLevelPsiElement = pair.second;
-
-        //showStartingEndingParentOfSelection();
-
-
         listOfStronglyRelatedPsiElements = MyDocumenter.getInstance().breakdownScopes(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement, MyDocumenter.FIRST_NESTED_LEVEL_INDEX, MyDocumenter.INF_NESTED);
+
         if(listOfStronglyRelatedPsiElements==null || listOfStronglyRelatedPsiElements.size()==0)
         {
             OddsAndEnds.showInfoBalloon("ADANA Plugin", "Not enough code is selected.");
@@ -140,13 +100,13 @@ public class DocumentSelectedCodeAction extends AnAction
             return;
 
 
-        ArrayList<Integer> thresholds = preProcessBreakDownWithDifferentThresholds();
+        /*ArrayList<Integer> thresholds = preProcessBreakDownWithDifferentThresholds();
         if(thresholds.size()==0)
         {
             // Not enough code is selected.
             //System.out.print("Not enough code is selected.");
             return;
-        }
+        }*/
 
         /*JPanel  granularitySliderPanel = new GranularitySliderPanel(this, thresholds);
         sliderPopup = JBPopupFactory.getInstance().createComponentPopupBuilder(granularitySliderPanel, null).setAlpha(0.5f) .createPopup();
@@ -166,6 +126,28 @@ public class DocumentSelectedCodeAction extends AnAction
                                             EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
                                     }
                                 });*/
+    }
+
+    private Pair<PsiElement, PsiElement> GetFirstAndLastPsiElementsInSelectedArea(AnActionEvent e)
+    {
+        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        final SelectionModel selectionModel = editor.getSelectionModel();
+        int selectionStartOffset = selectionModel.getSelectionStart();
+        int selectionEndOffset = selectionModel.getSelectionEnd();
+        //showStartingEndingParentOfSelection();
+
+        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
+        PsiElement selectionStartPsiElement = psiFile.findElementAt(selectionStartOffset);
+        PsiElement selectionEndPsiElement = psiFile.findElementAt(selectionEndOffset);
+
+
+        //lowestCommonAncestorPsiElement = findLowestCommonAncestor(selectionStartPsiElement, selectionEndPsiElement);
+
+        EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
+
+
+        Pair<PsiElement, PsiElement> pair = findLowestSameLevelStatement(selectionStartPsiElement, selectionEndPsiElement);
+        return pair;
     }
 
     private boolean isAncestor(PsiElement target, PsiElement supposalAncestor)
@@ -202,6 +184,9 @@ public class DocumentSelectedCodeAction extends AnAction
 
     private Pair<PsiElement, PsiElement> findLowestSameLevelStatement(PsiElement selectionStartPsiElement, PsiElement selectionEndPsiElement)
     {
+        if(selectionStartPsiElement==selectionEndPsiElement)
+            return new Pair<>(selectionStartPsiElement, selectionEndPsiElement);
+
         Pair<PsiElement, PsiElement> pair = findLowestSameLevelPsiElements(selectionStartPsiElement, selectionEndPsiElement);
 
         firstLowestSameLevelPsiElement = pair.first;
@@ -209,7 +194,7 @@ public class DocumentSelectedCodeAction extends AnAction
             firstLowestSameLevelPsiElement = firstLowestSameLevelPsiElement.getNextSibling();
 
         secondLowestSameLevelPsiElement = pair.second;
-        while(secondLowestSameLevelPsiElement!=null && (secondLowestSameLevelPsiElement instanceof PsiWhiteSpace || secondLowestSameLevelPsiElement instanceof PsiComment))
+        while (secondLowestSameLevelPsiElement != null && (secondLowestSameLevelPsiElement instanceof PsiWhiteSpace || secondLowestSameLevelPsiElement instanceof PsiComment))
             secondLowestSameLevelPsiElement = secondLowestSameLevelPsiElement.getPrevSibling();
 
         if(MyPsiUtils.getInstance().isAMinumumMeaningfullNode(firstLowestSameLevelPsiElement) == false || MyPsiUtils.getInstance().isAMinumumMeaningfullNode(secondLowestSameLevelPsiElement) ==false)
@@ -292,8 +277,6 @@ public class DocumentSelectedCodeAction extends AnAction
             return ((PsiMethod)m).getName();
     }
 
-
-
     private void processMethod(int methodStartingLine, int methodEndingLine, PsiFile psiFile, String currentProjectName, String currentFileName, String currentMethodName)
     {
         //if(methodEndingLine-methodStartingLine+1 < L_MIN )
@@ -375,7 +358,7 @@ public class DocumentSelectedCodeAction extends AnAction
 
     public void actionPerformed_minitool(AnActionEvent e)
     {
-        editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
         project = e.getRequiredData(CommonDataKeys.PROJECT);
         String currentProjectName = project.getName();
 
@@ -432,7 +415,7 @@ public class DocumentSelectedCodeAction extends AnAction
 
     }
 
-    private boolean showStartingEndingParentOfSelection()
+    private boolean showStartingEndingParentOfSelection(MarkupModel editorMarkupModel)
     {
         if(firstLowestSameLevelPsiElement==null || secondLowestSameLevelPsiElement==null)
         {
@@ -440,25 +423,25 @@ public class DocumentSelectedCodeAction extends AnAction
             return true;
         }
 
-        EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
+        EditorHighlightHelper.clearAllHighlightRange(editorMarkupModel);
         if(firstLowestSameLevelPsiElement!=secondLowestSameLevelPsiElement)
         {
-            EditorHighlightHelper.highlightRange(editor.getMarkupModel(), firstLowestSameLevelPsiElement.getTextRange().getStartOffset(), firstLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.RED);
-            EditorHighlightHelper.highlightRange(editor.getMarkupModel(), secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.YELLOW);
+            EditorHighlightHelper.highlightRange(editorMarkupModel, firstLowestSameLevelPsiElement.getTextRange().getStartOffset(), firstLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.RED);
+            EditorHighlightHelper.highlightRange(editorMarkupModel, secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.YELLOW);
         }
         else
         {
-            EditorHighlightHelper.highlightRange(editor.getMarkupModel(), secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.ORANGE);
+            EditorHighlightHelper.highlightRange(editorMarkupModel, secondLowestSameLevelPsiElement.getTextRange().getStartOffset(), secondLowestSameLevelPsiElement.getTextRange().getEndOffset(), Color.ORANGE);
         }
 
         PsiElement parentOfBoth = firstLowestSameLevelPsiElement.getParent();
         if(secondLowestSameLevelPsiElement.getParent()!=parentOfBoth)
         {
-            EditorHighlightHelper.clearAllHighlightRange(editor.getMarkupModel());
-            EditorHighlightHelper.highlightRange(editor.getMarkupModel(), parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.BLACK);
+            EditorHighlightHelper.clearAllHighlightRange(editorMarkupModel);
+            EditorHighlightHelper.highlightRange(editorMarkupModel, parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.BLACK);
         }
         else
-            EditorHighlightHelper.highlightRange(editor.getMarkupModel(), parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.CYAN);
+            EditorHighlightHelper.highlightRange(editorMarkupModel, parentOfBoth.getTextRange().getStartOffset(), parentOfBoth.getTextRange().getEndOffset(), Color.CYAN);
         return false;
     }
 
@@ -488,7 +471,7 @@ public class DocumentSelectedCodeAction extends AnAction
         ///////////// 1/2
         for(int value=1;value<10;value++)
         {
-            tryToBreakDownSelectedCode(value);
+            tryToBreakDownSelectedCode(value, null);
             if(listOfStronglyRelatedPsiElements!=null && listOfStronglyRelatedPsiElements.size()!=0 && exists_f(possibleResults, listOfStronglyRelatedPsiElements)==false)
             {
                 thresholds.add(value);
@@ -496,7 +479,7 @@ public class DocumentSelectedCodeAction extends AnAction
             }
         }
         ///////////// 2/2
-        tryToBreakDownSelectedCode(WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER);
+        tryToBreakDownSelectedCode(WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER, null);
         if(listOfStronglyRelatedPsiElements!=null && listOfStronglyRelatedPsiElements.size()!=0 && exists_f(possibleResults, listOfStronglyRelatedPsiElements)==false)
         {
             thresholds.add(WHOLE_BLOCK_THRESHOLD_MAGIC_NUMBER);
@@ -507,12 +490,12 @@ public class DocumentSelectedCodeAction extends AnAction
         return thresholds;
     }
 
-    public void tryToBreakDownSelectedCode(int sliderValue)
+    public void tryToBreakDownSelectedCode(int sliderValue, MarkupModel editorMarkupModel)
     {
         if(firstLowestSameLevelPsiElement!=null && secondLowestSameLevelPsiElement!=null)
         {
             listOfStronglyRelatedPsiElements = breakDownPsiElementToRelatedParts(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement, 0, sliderValue);
-            EditorHighlightHelper.highlightAllDiscoveredCodeSnippet(editor.getMarkupModel(), listOfStronglyRelatedPsiElements, true);
+            EditorHighlightHelper.highlightAllDiscoveredCodeSnippet(editorMarkupModel, listOfStronglyRelatedPsiElements, true);
         }
         else
         {
@@ -534,11 +517,11 @@ public class DocumentSelectedCodeAction extends AnAction
         }*/
     }
 
-    public void createCodeDescriptionPopup(StronglyRelatedPsiElements s)
+    /*public void createCodeDescriptionPopup(StronglyRelatedPsiElements s)
     {
         CodeDescriptionPopup c = new CodeDescriptionPopup(s, this);
         c.getComponent().showInBestPositionFor(editor);
-    }
+    }*/
 
     private ArrayList<StronglyRelatedPsiElements> breakDownPsiElementToRelatedParts(PsiCodeBlock _psiCodeBlock, int nestedLevel, int maxAccetableVariableDistance)
     {
@@ -828,11 +811,20 @@ public class DocumentSelectedCodeAction extends AnAction
     @Override
     public void update(AnActionEvent e)
     {
-        final Project project = e.getData(CommonDataKeys.PROJECT);
-        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
-        Editor editor = e.getData(PlatformDataKeys.EDITOR);
-        e.getPresentation().setVisible((project != null && editor != null));
+        project = e.getRequiredData(CommonDataKeys.PROJECT);
 
+        Pair<PsiElement, PsiElement> pair = GetFirstAndLastPsiElementsInSelectedArea(e);
+        firstLowestSameLevelPsiElement = pair.first;
+        secondLowestSameLevelPsiElement = pair.second;
+        ArrayList<PsiElement> psiElements = MyPsiUtils.getInstance().createListOfMeaningfulElements(firstLowestSameLevelPsiElement, secondLowestSameLevelPsiElement);
+        if(MyPsiUtils.getInstance().countNMeaninfulNodeInWholeSubtree(psiElements)<MyDocumenter.MIN_BLOCK_SIZE)
+        {
+            e.getPresentation().setEnabled(false);
+        }
+        else
+        {
+            e.getPresentation().setEnabled(true);
+        }
     }
 
     private PsiClass getPsiClassFromContext(AnActionEvent e)

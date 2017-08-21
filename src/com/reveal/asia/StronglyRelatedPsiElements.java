@@ -218,7 +218,7 @@ class StronglyRelatedPsiElements
             retrievedCodeDescriptionFromServer = obj.getString("retrievedCloneDescription");
         }
 
-        if(retrievedCodeDescriptionFromServer =="")
+        if(retrievedCodeDescriptionFromServer.isEmpty())
             return false;
         else
             return true;

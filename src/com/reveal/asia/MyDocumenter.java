@@ -134,9 +134,8 @@ public class MyDocumenter
                         duplicateIndex = i;
                         if(s.getNestedLevel()>retrievedDescriptions.get(i).getSecond().getNestedLevel())
                         {
-                            preferMySelf = false;
                             //The one which is in the list as lower nested level. Good!
-                            s.removeAddedCommentPsiElement(); //ignore nested one.
+                            preferMySelf = false;
                         }
                         else
                         {
@@ -167,11 +166,12 @@ public class MyDocumenter
         }
 
 
-        for(int g=0;g<listOfStronglyRelatedPsiElements.size();g++)
+        for(int g=0;g<retrievedDescriptions.size();g++)
         {
-            StronglyRelatedPsiElements s = listOfStronglyRelatedPsiElements.get(g);
+            retrievedDescriptions.get(g).getSecond().addCommentPsiElement();
+            /*StronglyRelatedPsiElements s = listOfStronglyRelatedPsiElements.get(g);
             if(s.getRetrievedCodeDescriptionFromServer()!="")
-                s.addCommentPsiElement();
+                s.addCommentPsiElement();*/
         }
 
         return (retrievedDescriptions.size()!=0);
