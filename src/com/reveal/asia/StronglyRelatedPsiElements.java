@@ -1,5 +1,7 @@
 package com.reveal.asia;
 
+import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
 import org.json.*;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
  */
 class StronglyRelatedPsiElements
 {
+    String uncommentedCode = "";
     ArrayList<PsiElement> psiElements = new ArrayList<>();
     ArrayList<PsiElement> newlyAddedComments = new ArrayList<>();
     String retrievedCodeDescriptionFromServer = "";
@@ -43,6 +46,15 @@ class StronglyRelatedPsiElements
     {
         nestedLevel = _nestedLevel;
         psiElements = _elements;
+        // We convert PsiElements to text immediately and never repeat it. because later we might add "comment" to subtrees.
+        uncommentedCode = convertPsiElementsToText();
+    }
+
+    public String getUncommentedCode()
+    {
+        // It's not guranteed unless in the constructors the _elements didn't include any comments in subtrees.
+        // TODO: To guarantee it, first we should iterate all elements (like "RemoveCodeComment" action)
+        return uncommentedCode;
     }
 
     public String getRetrievedCodeDescriptionFromServer()
@@ -52,29 +64,27 @@ class StronglyRelatedPsiElements
 
     public String getCodeDescriptionExistsInEditor()
     {
-        String codeDescriptionExistsInEditor = "";
+        /*String codeDescriptionExistsInEditor = "";
         for(int i=0; i<newlyAddedComments.size(); i++)
         {
             codeDescriptionExistsInEditor += newlyAddedComments.get(i).getText();
         }
-        return codeDescriptionExistsInEditor;
-        /* Solution when comments are supposed to change:
-        ---------------------------------------------------
-        ---------------------------------------------------
-         String codeDescriptionExistsInEditor = "";
+        return codeDescriptionExistsInEditor;*/
+
+
+        //Solution when comments are supposed to change Below Code:
         // TODO: newlyAddedComments elements are not valid if comments are changed in editor. By changing in editor,
         // The PsiElements (in Editor Tree) are replaced with new PsiElements and we don't have reference to them.
         // Here we do a trick and access changed comment, using valid (because of unchanged) first elements.
+        // WARNING: For if added comments is one line
+        String codeDescriptionExistsInEditor = "";
         if(newlyAddedComments.size()==0)
             return "";
-        codeDescriptionExistsInEditor += psiElements.get(0).getPrevSibling().getPrevSibling().getText()+"\n";
+        codeDescriptionExistsInEditor += psiElements.get(0).getPrevSibling().getPrevSibling().getText();
         return codeDescriptionExistsInEditor;
-        ---------------------------------------------------
-        ---------------------------------------------------
-         */
     }
 
-    public String convertPsiElementsToText()
+    private String convertPsiElementsToText()
     {
         //Note: The code might include already=-commented subtree code blocks! (if inner parts are annotated with comment in editor)
         String code = "";
@@ -88,7 +98,7 @@ class StronglyRelatedPsiElements
         String codeWithComment = "";
         if(getCodeDescriptionExistsInEditor()!="")
             codeWithComment += getCodeDescriptionExistsInEditor() + "\n";
-        codeWithComment += convertPsiElementsToText();
+        codeWithComment += getUncommentedCode();
         return codeWithComment;
     }
 
@@ -119,7 +129,7 @@ class StronglyRelatedPsiElements
 
     private String sendCodeToServerAndRetrieveDescriptionsLocally()
     {
-        String code = convertPsiElementsToText();
+        String code = getUncommentedCode();
         code = code.replace("\n"," ");
         String response = ASIAWrapper.getInstance().findDescriptions(code);
         return response;
@@ -130,23 +140,15 @@ class StronglyRelatedPsiElements
 
         try
         {
-            String code = convertPsiElementsToText();
+            String code = getUncommentedCode();
             code = code.replace("\n"," ");
-
             code = URLEncoder.encode(code,"UTF-8");
-
             String urlParameters  = "selectedCode="+code;
-
-
-            //urlParameters = URLEncoder.encode(urlParameters, "UTF-8");
-
             byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
-
-
             int    postDataLength = postData.length;
-            String request        = "http://localhost:8080/ASIAWebApp/MainServlet";
-            URL url            = null;
-            url = new URL( request );
+            ////////////////
+            String request        = "http://localhost:8080/ASIAWebApp/MainServlet/getDescription";
+            URL url = new URL( request );
             HttpURLConnection conn= (HttpURLConnection) url.openConnection();
             conn.setDoOutput( true );
             conn.setInstanceFollowRedirects( false );
@@ -182,7 +184,6 @@ class StronglyRelatedPsiElements
 
     public boolean retrieveDescription()
     {
-        //Note: The code that we are sending might include already=-commented subtree code blocks! (if inner parts are annotated with comment in editor)
         //String serverRes = sendCodeToServerAndRetrieveDescriptionsLocally();
         String serverRes = sendCodeToServerAndRetrieveDescriptions();
 
@@ -319,18 +320,37 @@ class StronglyRelatedPsiElements
                     @Override
                     public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent)
                     {
-                        AnAction keepAction  = new AnAction("Keep", "Keep Comment.", Icons.CHECK_ICON)
+                        AnAction keepAction_1star  = new AnAction("Keep ☆", "Keep comment", Icons.CHECK_ICON)
                         {
                             @Override
                             public void actionPerformed(AnActionEvent anActionEvent)
                             {
                                 documentMarkupModel.removeHighlighter(rh);
+                                updateADANADatasetWithConfirmedDescription(1);
                             }
-
-
                         };
 
-                        AnAction discardAction  = new AnAction("Discard", "Discard Comment.", Icons.DELETE_ICON)
+                        AnAction keepAction_2star  = new AnAction("Keep ☆☆", "Keep comment", Icons.CHECK_ICON)
+                        {
+                            @Override
+                            public void actionPerformed(AnActionEvent anActionEvent)
+                            {
+                                documentMarkupModel.removeHighlighter(rh);
+                                updateADANADatasetWithConfirmedDescription(2);
+                            }
+                        };
+
+                        AnAction keepAction_3star  = new AnAction("Keep ☆☆☆", "Keep comment", Icons.CHECK_ICON)
+                        {
+                            @Override
+                            public void actionPerformed(AnActionEvent anActionEvent)
+                            {
+                                documentMarkupModel.removeHighlighter(rh);
+                                updateADANADatasetWithConfirmedDescription(3);
+                            }
+                        };
+
+                        AnAction discardAction  = new AnAction("Delete", "Delete comment", Icons.DELETE_ICON)
                         {
                             @Override
                             public void actionPerformed(AnActionEvent anActionEvent)
@@ -342,7 +362,7 @@ class StronglyRelatedPsiElements
 
                         };
 
-                        AnAction[] actions = new AnAction[]{keepAction, discardAction};
+                        AnAction[] actions = new AnAction[]{keepAction_1star, keepAction_2star, keepAction_3star, discardAction};
                         return actions;
                     }
                 };
@@ -363,6 +383,78 @@ class StronglyRelatedPsiElements
             }*/
 
         });
+    }
+
+    private String removePeriodFromEndOfString(String str)
+    {
+        char lastChar = str.charAt(str.length()-1);
+        if(lastChar=='.')
+            return str.substring(0, str.length()-1);
+        else
+            return str;
+    }
+
+    private void updateADANADatasetWithConfirmedDescription(int userScore)
+    {
+        String uncommentedCode = getUncommentedCode();
+        String updatedComment = getCodeDescriptionExistsInEditor();
+        updatedComment = updatedComment.substring("//".length());
+        updatedComment = updatedComment.trim();
+        updatedComment = removePeriodFromEndOfString(updatedComment);
+        String resultJson = sendCodeAndCommentToServerToUpdateDataset(uncommentedCode, updatedComment, userScore);
+        if(true)
+            System.out.print("Updateed Suc");
+        else
+            System.out.print("Failed");
+    }
+
+    private String sendCodeAndCommentToServerToUpdateDataset(String _code, String _description, int _score)
+    {
+
+        try
+        {
+            String urlParameters = "";
+            ////////
+            _code = _code.replace("\n"," ");
+            _code = URLEncoder.encode(_code,"UTF-8");
+            urlParameters += "code="+_code;
+            ////////
+            _description = _description.replace("\n"," ");
+            _description = URLEncoder.encode(_description,"UTF-8");
+            urlParameters += "&description="+_description;
+            ////////
+            urlParameters += "&score="+Integer.toString(_score);
+            ////////
+            byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
+            int    postDataLength = postData.length;
+            ////////////////////
+            String request        = "http://localhost:8080/ASIAWebApp/MainServlet/updateDataset";
+            URL url = new URL( request );
+            HttpURLConnection conn= (HttpURLConnection) url.openConnection();
+            conn.setDoOutput( true );
+            conn.setInstanceFollowRedirects( false );
+            conn.setRequestMethod( "POST" );
+            conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty( "charset", "utf-8");
+            conn.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+            conn.setUseCaches( false );
+            try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
+                wr.write( postData );
+            }
+
+            Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+            StringBuilder sb = new StringBuilder();
+            for (int c; (c = in.read()) >= 0;)
+                sb.append((char)c);
+            String response = sb.toString();
+            return response;
+        } catch (IOException e)
+        {
+            //OddsAndEnds.showInfoBalloon("ADANA Plugin", "Server connection refused."); //No, we may be in auto-all-document mode and UI sucks.
+            e.printStackTrace();
+            return String.format("{\"result\": -1, \"errorDescription\":\"%s\" }",e.toString());
+        }
     }
 
     @Override
