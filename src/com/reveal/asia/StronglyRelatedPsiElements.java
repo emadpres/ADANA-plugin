@@ -137,7 +137,6 @@ class StronglyRelatedPsiElements
 
     private String sendCodeToServerAndRetrieveDescriptions()
     {
-
         try
         {
             String code = getUncommentedCode();
@@ -170,7 +169,7 @@ class StronglyRelatedPsiElements
             return response;
         } catch (IOException e)
         {
-            //OddsAndEnds.showInfoBalloon("ADANA Plugin", "Server connection refused."); //No, we may be in auto-all-document mode and UI sucks.
+            OddsAndEnds.showInfoBalloon("ADANA Plugin", "Connecting to ADANA server failed"); //TODO: No, we may be in auto-all-document mode and UI sucks.
             e.printStackTrace();
             return String.format("{\"result\": -1, \"errorDescription\":\"%s\" }",e.toString());
         }
@@ -451,7 +450,7 @@ class StronglyRelatedPsiElements
             return response;
         } catch (IOException e)
         {
-            //OddsAndEnds.showInfoBalloon("ADANA Plugin", "Server connection refused."); //No, we may be in auto-all-document mode and UI sucks.
+            OddsAndEnds.showInfoBalloon("ADANA Plugin", "Connecting to ADANA server failed"); //TODO: No, we may be in auto-all-document mode and UI sucks.
             e.printStackTrace();
             return String.format("{\"result\": -1, \"errorDescription\":\"%s\" }",e.toString());
         }

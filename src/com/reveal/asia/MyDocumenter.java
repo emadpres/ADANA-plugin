@@ -183,7 +183,7 @@ public class MyDocumenter
         if(!anyFound)
         {
             EditorHighlightHelper.clearAllHighlightRange(documentMarkupModel);
-            OddsAndEnds.showInfoBalloon("ADANA Plugin", "Don't be disappointed, but unfortunately no result.");
+            OddsAndEnds.showInfoBalloon("ADANA Plugin", "No result Found.");
         }
         else
         {
