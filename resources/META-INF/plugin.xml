@@ -2,16 +2,14 @@
   <id>com.reveal.asia</id>
   <name>ADANA</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <vendor email="anonymous" url="anonymous">ADANA</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      <em>ADANA</em> is a novel approach to automatically generate and inject comments that describe a given piece of source code.<br>
+      Select a piece of code, right click and select <em>Document Selected Code</em>
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
     ]]>
   </change-notes>
 
@@ -40,12 +38,12 @@
       <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
       <keyboard-shortcut keymap="$default" first-keystroke="shift meta A"/>
     </action>
-    <action id="RemoveCommentsAction" class="com.reveal.asia.RemoveCommentsAction" text="Remove All Comments">
+    <!--<action id="RemoveCommentsAction" class="com.reveal.asia.RemoveCommentsAction" text="Remove All Comments">
       <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
     </action>
       <action id="DocumentAll" class="com.reveal.asia.DocumentAllAction" text="Document All" description="Document All Methods">
           <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
-      </action>
+      </action>-->
   </actions>
 
 
