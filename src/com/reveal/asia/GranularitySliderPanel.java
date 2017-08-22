@@ -6,10 +6,11 @@ import com.intellij.psi.PsiElement;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-
-
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 
 public class GranularitySliderPanel extends JPanel {
@@ -51,7 +52,13 @@ public class GranularitySliderPanel extends JPanel {
         breakDownThresholdSlider = new TransparentSlider(JSlider.HORIZONTAL, MyDocumenter.FIRST_NESTED_LEVEL_INDEX, maxNestedLevelInSelectedCode, MyDocumenter.FIRST_NESTED_LEVEL_INDEX);
         breakDownThresholdSlider.setSnapToTicks(true);
         breakDownThresholdSlider.setMajorTickSpacing(1);
+        breakDownThresholdSlider.setPreferredSize(new Dimension(200,40));
         breakDownThresholdSlider.setPaintTicks(true);
+        Hashtable<Integer, JLabel> labels =  new Hashtable<Integer, JLabel>();
+        labels.put(MyDocumenter.FIRST_NESTED_LEVEL_INDEX, new JLabel("High"));
+        labels.put(maxNestedLevelInSelectedCode, new JLabel("Low"));
+        breakDownThresholdSlider.setLabelTable(labels);
+        breakDownThresholdSlider.setPaintLabels(true);
         breakDownThresholdSlider.addChangeListener(new ChangeListener()
         {
             @Override
