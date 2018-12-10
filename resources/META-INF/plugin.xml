@@ -2,7 +2,7 @@
   <id>com.reveal.asia</id>
   <name>ADANA</name>
   <version>1.0</version>
-  <vendor email="anonymous" url="anonymous">ADANA</vendor>
+  <vendor email="emad.aghajani@usi.ch" url="http://adana.si.usi.ch">ADANA</vendor>
 
   <description><![CDATA[
       <em>ADANA</em> is a novel approach to automatically generate and inject comments that describe a given piece of source code.<br>

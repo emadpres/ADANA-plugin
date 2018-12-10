@@ -32,6 +32,17 @@ import java.util.ArrayList;
  */
 class StronglyRelatedPsiElements
 {
+    /*
+        Why serverAdress for local is /ADANA_Plugin but for real server (docker image) /ADANA/ADANA_Plugin ?
+        Because as you will in Dockerfile, we copy ADANA.war to somewhere target machine and unzip it.
+        and it makes one more step (=/ADANA/).
+     */
+    // adana.si.usi.ch ---refer to---> rio.inf.usi.ch
+    String ServerAddress_Base = "http://adana.si.usi.ch:36123/ADANA/ADANA_Plugin"; // production
+    //String ServerAddress_Base = "http://localhost:36123/ADANA/ADANA_Plugin"; //Testing docker running on my machine
+    //String ServerAddress_Base = "http://localhost:8080/ADANA_Plugin";
+
+
     String uncommentedCode = "";
     ArrayList<PsiElement> psiElements = new ArrayList<>();
     ArrayList<PsiElement> newlyAddedComments = new ArrayList<>();
@@ -146,7 +157,7 @@ class StronglyRelatedPsiElements
             byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
             int    postDataLength = postData.length;
             ////////////////
-            String request        = "http://localhost:8080/ASIAWebApp/MainServlet/getDescription";
+            String request        = ServerAddress_Base+"/getDescription";
             URL url = new URL( request );
             HttpURLConnection conn= (HttpURLConnection) url.openConnection();
             conn.setDoOutput( true );
@@ -427,7 +438,7 @@ class StronglyRelatedPsiElements
             byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
             int    postDataLength = postData.length;
             ////////////////////
-            String request        = "http://localhost:8080/ASIAWebApp/MainServlet/updateDataset";
+            String request        = ServerAddress_Base+"/updateDataset";
             URL url = new URL( request );
             HttpURLConnection conn= (HttpURLConnection) url.openConnection();
             conn.setDoOutput( true );
