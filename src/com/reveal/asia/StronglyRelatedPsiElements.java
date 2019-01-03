@@ -34,8 +34,8 @@ class StronglyRelatedPsiElements
 {
     /*
         Why serverAdress for local is /ADANA_Plugin but for real server (docker image) /ADANA/ADANA_Plugin ?
-        Because as you will in Dockerfile, we copy ADANA.war to somewhere target machine and unzip it.
-        and it makes one more step (=/ADANA/).
+        Because as you will see in Dockerfile, we copy (let's say) ADANA_FUNKY_NAME.war to somewhere target machine and unzip it.
+        and it makes one more step (=/ADANA_FUNKY_NAME/).
      */
     // adana.si.usi.ch ---refer to---> rio.inf.usi.ch
     String ServerAddress_Base = "http://adana.si.usi.ch:36123/ADANA/ADANA_Plugin"; // production
