@@ -138,14 +138,6 @@ class StronglyRelatedPsiElements
         return nestedLevel;
     }
 
-    private String sendCodeToServerAndRetrieveDescriptionsLocally()
-    {
-        String code = getUncommentedCode();
-        code = code.replace("\n"," ");
-        String response = ASIAWrapper.getInstance().findDescriptions(code);
-        return response;
-    }
-
     private String sendCodeToServerAndRetrieveDescriptions()
     {
         try
