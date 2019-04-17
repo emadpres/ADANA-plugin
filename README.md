@@ -1,7 +1,9 @@
 # ADANA
 [*ADANA*](http://ADANA.si.usi.ch/) is a novel approach to automatically generate and inject comments that describe a given piece of source code. This repository accommodate the ADANA Android Studio/IntelliJ IDE plugin. After installing the plugin on the IDE, select a piece of code, right click and select <em>Document Selected Code</em>.
 
+![](screens/adana-sample.gif)
 <img src="http://adana.si.usi.ch/img/gui.png" alt="Plugin Screenshot" width="700">
+
 
 
 ## Installation
