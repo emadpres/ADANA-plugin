@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <link rel="stylesheet" href="./highlight/styles/vs.css">
+    <script src="./highlight/highlight.pack.js"></script>
+    <script>
+    hljs.initHighlightingOnLoad();
+    </script>
+    <style type="text/css">
+    table {
+        border: 5px solid black;
+        margin: 20px;
+    }
+
+    .firstRow {
+        border-bottom: 2px solid black;
+    }
+    </style>
+    <title>Page Title</title>
+</head>
+
+<body>
+    <h1>Third Study Verficication Questions (ADANA, Section 3.1.3)</h1>
+    <p>In this page you can find 16 pairs of code snippet, one without comments and one commented automatically by ADANA, used in the third study (see Section 3.1.3). Each code snippet, either commented or not commented versions, is accompanied by three multiple-choice verification questions to validate the participants' comprehension.
+        <br> Note that obviously the way this content is presented in this page is only for reviewing purpose and the study was conducted as explained in the paper.
+    </p>
+    <div style="width: 90%; background-color: lightgrey; margin: 0 auto;">
+        <div style="width: 90%; margin: auto; padding: 10px;">
+            <p>Code Snippet <a href="#s1">#1</a>
+                <a href="#s2">#2</a>
+                <a href="#s3">#3</a>
+                <a href="#s4">#4</a>
+                <a href="#s5">#5</a>
+                <a href="#s6">#6</a>
+                <a href="#s7">#7</a>
+                <a href="#s8">#8</a>
+                <a href="#s9">#9</a>
+                <a href="#s10">#10</a>
+                <a href="#s11">#11</a>
+                <a href="#s12">#12</a>
+                <a href="#s13">#13</a>
+                <a href="#s14">#14</a>
+                <a href="#s15">#15</a>
+                <a href="#s16">#16</a>
+            </p>
+            <table id="s1" style="width:100%">
+                <tr>
+                    <td>Code Snippet #1</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                    super(view);
+                    search_icon.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            if (mSearchClickListener != null) {
+                                mSearchClickListener.onItemClick(v, getLayoutPosition());
+                            }
+                        }
+                    });
+                    clear_button.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            search_text.setText();
+                            searchText =;
+                            clear_button.setVisibility(View.GONE);
+                            if (mSearchClickListener != null) {
+                                mSearchClickListener.onItemClick(v, getLayoutPosition());
+                            }
+                        }
+                    });
+                    search_text.setOnKeyListener(new OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                                if (mSearchClickListener != null) {
+                                    mSearchClickListener.onItemClick(v, getLayoutPosition());
+                                }
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                    search_text.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable arg0) {
+                        }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence arg0, int arg1,
+                                                      int arg2, int arg3) {
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            if (s.length() > 0) {
+                                clear_button.setVisibility(View.VISIBLE);
+                                searchText = s.toString();
+                            }
+                        }
+                    });
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        super(view);
+                        search_icon.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                if (mSearchClickListener != null) {
+                                    mSearchClickListener.onItemClick(v, getLayoutPosition());
+                                }
+                            }
+                        });
+                        clear_button.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                search_text.setText();
+                                searchText =;
+                                clear_button.setVisibility(View.GONE);
+                                if (mSearchClickListener != null) {
+                                    mSearchClickListener.onItemClick(v, getLayoutPosition());
+                                }
+                            }
+                        });
+                        search_text.setOnKeyListener(new OnKeyListener() {
+                            @Override
+                            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                                    if (mSearchClickListener != null) {
+                                        mSearchClickListener.onItemClick(v, getLayoutPosition());
+                                    }
+                                    return true;
+                                }
+                                return false;
+                            }
+                        });
+                        search_text.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void afterTextChanged(Editable arg0) {
+                            }
+
+                            @Override
+                            public void beforeTextChanged(CharSequence arg0, int arg1,
+                                                          int arg2, int arg3) {
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                // Shows a Clear button after the first character pressed and hides it when the text is empty. 
+                                if (s.length() > 0) {
+                                    clear_button.setVisibility(View.VISIBLE);
+                                    searchText = s.toString();
+                                }
+                            }
+                        });
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        1. <strong>When is the clear_button shown to the user?</strong>
+                        <form action="">
+                            <input type="radio" name="gender" value="opt1"> It is always visible
+                            <br><input type="radio" name="gender" value="opt2"> It is shown when the text in search_text changes
+                            <br><input type="radio" name="gender" value="opt3"> It is shown when the text in search_text changes, but only when specific conditions are met 
+                        </form>
+                        <br>2. <strong>What is the visibility of the clear_button when the length of the CharSequence s is zero?</strong>
+                        <form action="">
+                            <input type="radio" name="gender" value="opt1"> Is visible
+                            <br><input type="radio" name="gender" value="opt2"> Is not visible 
+                            <br><input type="radio" name="gender" value="opt3"> It depends on the textual content of the CharSequence s
+                        </form>
+                        <br>3. <strong>What is the main purpose of the TextWatcher object?</strong>
+                        <form action="">
+                            <input type="radio" name="gender" value="opt1"> To react to changes to the text contained in search_text
+                            <br><input type="radio" name="gender" value="opt2"> To show and manage events related to any text on the phone display
+                            <br><input type="radio" name="gender" value="opt3"> To reset the search field when the view is loaded
+                        </form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s2" style="width:100%">
+                <tr>
+                    <td>Code Snippet #2</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        updateStyle(hasData);
+                        if (isLoading) {
+                            if (mDataLoadingView != null && hasData) {
+                                setVisibility(GONE);
+                                mDataLoadingView.setVisibility(VISIBLE);
+                            } else {
+                                setVisibility(VISIBLE);
+                                mProgressLayout.setVisibility(VISIBLE);
+                                viewStartAnimation(mProgressView);
+                                mEmptyView.setVisibility(GONE);
+                            }
+                        } else {
+                            if (mDataLoadingView != null) {
+                                mDataLoadingView.setVisibility(GONE);
+                            }
+                            if (hasData) {
+                                setVisibility(GONE);
+                            } else {
+                                setVisibility(VISIBLE);
+                                mProgressLayout.setVisibility(GONE);
+                                viewStopANimation(mProgressView);
+                                mEmptyView.setVisibility(VISIBLE);
+                            }
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        updateStyle(hasData);
+                        if (isLoading) {
+                            if (mDataLoadingView != null && hasData) {
+                                setVisibility(GONE);
+                                mDataLoadingView.setVisibility(VISIBLE);
+                            } else {
+                                setVisibility(VISIBLE);
+                                mProgressLayout.setVisibility(VISIBLE);
+                                viewStartAnimation(mProgressView);
+                                mEmptyView.setVisibility(GONE);
+                            }
+                        } else {
+                            if (mDataLoadingView != null) {
+                                mDataLoadingView.setVisibility(GONE);
+                            }
+                            if (hasData) {
+                                setVisibility(GONE);
+                            } else {
+                                // Controls the progressbar appear/disappear like loading fragment. 
+                                setVisibility(VISIBLE);
+                                mProgressLayout.setVisibility(GONE);
+                                viewStopANimation(mProgressView);
+                                mEmptyView.setVisibility(VISIBLE);
+                            }
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>The main condition that defines the snippet execution is:</strong>
+                        <form action="">
+                            <input type="radio" name="gender" value="opt1"> isLoading
+                            <br><input type="radio" name="gender" value="opt2"> mDataLoadingView != null
+                            <br><input type="radio" name="gender" value="opt3"> hasData
+                        </form>
+                        <br>2. <strong>mEmptyView and mDataLoadingView are examples of:</strong>
+                        <form action="">
+                            <input type="radio" name="gender" value="opt1"> Objects that extends fom the View class
+                            <br><input type="radio" name="gender" value="opt2"> Buttons in the GUI
+                            <br><input type="radio" name="gender" value="opt3"> Progress bars in the GUI
+                        </form>
+                        <br>3. <strong>The setVisibility(GONE) API call allows for:</strong>
+                        <form action="">
+                            <input type="radio" name="gender" value="opt1"> Displaying a view that is invisible
+                            <br><input type="radio" name="gender" value="opt2"> Hiding a view that is visible
+                            <br><input type="radio" name="gender" value="opt3"> Moving a view to the top of the stack
+                        </form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s3" style="width:100%">
+                <tr>
+                    <td>Code Snippet #3</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            int size = nextItemList.size();
+                            NextItem item;
+                            if (size > 0 && (item = nextItemList.get(position % size)) != null) {
+                                Intent intent = new Intent(activity, DetailActivity.class);
+                                intent.putExtra(Constant.NEXT_ITEM, item);
+                                startActivityForResult(intent, REQUEST_CODE);
+                            }
+                        }
+                    });
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // Makes Android list item pass id on to next view. 
+                        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                int size = nextItemList.size();
+                                NextItem item;
+                                if (size > 0 && (item = nextItemList.get(position % size)) != null) {
+                                    // Populates an activity from ListView. 
+                                    Intent intent = new Intent(activity, DetailActivity.class);
+                                    intent.putExtra(Constant.NEXT_ITEM, item);
+                                    startActivityForResult(intent, REQUEST_CODE);
+                                }
+                            }
+                        });
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>The snippet is an example of?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Invoking an activity when clicking on a list item
+						    <br><input type="radio" name="gender" value="opt2"> View holder pattern
+						    <br><input type="radio" name="gender" value="opt3"> Implicit intent
+						</form>
+						<br>2. <strong>The activity invocation inside the onItemClick method is</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Asynchronous
+						    <br><input type="radio" name="gender" value="opt2"> Synchronous
+						    <br><input type="radio" name="gender" value="opt3"> There is no activity invocation
+						</form>
+						<br>3. <strong>The startActivityForResult invocation requires to implement the following method</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> onActivityResult()
+						    <br><input type="radio" name="gender" value="opt2"> onNewIntent()
+						    <br><input type="radio" name="gender" value="opt3"> onDestroy()
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s4" style="width:100%">
+                <tr>
+                    <td>Code Snippet #4</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        String mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                        mFilePath += /SoundRecorder/ + name;
+                        File f = new File(mFilePath);
+                        if (f.exists() && !f.isDirectory()) {
+                            Toast.makeText(mContext,
+                                    String.format(mContext.getString(R.string.toast_file_exists), name),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            File oldFilePath = new File(getItem(position).getFilePath());
+                            oldFilePath.renameTo(f);
+                            mDatabase.renameItem(getItem(position), name, mFilePath);
+                            notifyItemChanged(position);
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        String mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                        mFilePath += /SoundRecorder/ + name;
+                        File f = new File(mFilePath);
+                        if (f.exists() && !f.isDirectory()) {
+                            Toast.makeText(mContext,
+                                    String.format(mContext.getString(R.string.toast_file_exists), name),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Renames a file on sdcard. 
+                            File oldFilePath = new File(getItem(position).getFilePath());
+                            oldFilePath.renameTo(f);
+                            mDatabase.renameItem(getItem(position), name, mFilePath);
+                            notifyItemChanged(position);
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of the shown snippet of code?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To rename a file stored in a Web server
+						    <br><input type="radio" name="gender" value="opt2"> To rename a file stored in a SD card 
+						    <br><input type="radio" name="gender" value="opt3"> To rename a file stored in the Smartphones flash memory
+						</form>
+						<br>2. <strong>In which branch of the if/else construct the file is actually renamed?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> If
+						    <br><input type="radio" name="gender" value="opt2"> Else 
+						    <br><input type="radio" name="gender" value="opt3"> None of the two
+						</form>
+						<br>3. <strong>Which variable stores the path of the renamed file?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> name
+						    <br><input type="radio" name="gender" value="opt2"> f
+						    <br><input type="radio" name="gender" value="opt3"> no variable is used to store the new file name
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s5" style="width:100%">
+                <tr>
+                    <td>Code Snippet #5</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        try {
+                        locationManager = (LocationManager) mContext
+                                .getSystemService(LOCATION_SERVICE);
+                        isGPSEnabled = locationManager
+                                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+                        isNetworkEnabled = locationManager
+                                .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                        if (!isGPSEnabled && !isNetworkEnabled) {
+                        } else {
+                            this.canGetLocation = true;
+                            if (isNetworkEnabled) {
+                                if (ActivityCompat.checkSelfPermission(this, 
+                                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED 
+                                    && ActivityCompat.checkSelfPermission(this, 
+                                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    return null;
+                                }
+                                locationManager.requestLocationUpdates(
+                                        LocationManager.NETWORK_PROVIDER,
+                                        MIN_TIME_BW_UPDATES,
+                                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                                Log.d(Network, Network);
+                                if (locationManager != null) {
+                                    location = locationManager
+                                            .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                    if (location != null) {
+                                        latitude = location.getLatitude();
+                                        longitude = location.getLongitude();
+                                    }
+                                }
+                            }
+                            if (isGPSEnabled) {
+                                if (location == null) {
+                                    locationManager.requestLocationUpdates(
+                                            LocationManager.GPS_PROVIDER,
+                                            MIN_TIME_BW_UPDATES,
+                                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                                    Log.d(GPS Enabled, GPS Enabled);
+                                    if (locationManager != null) {
+                                        location = locationManager
+                                                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                                        if (location != null) {
+                                            latitude = location.getLatitude();
+                                            longitude = location.getLongitude();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return location;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        try {
+                        locationManager = (LocationManager) mContext
+                                .getSystemService(LOCATION_SERVICE);
+                        isGPSEnabled = locationManager
+                                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+                        isNetworkEnabled = locationManager
+                                .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                        if (!isGPSEnabled && !isNetworkEnabled) {
+                        } else {
+                            this.canGetLocation = true;
+                            if (isNetworkEnabled) {
+                                // Checks permission in fragment. 
+                                if (ActivityCompat.checkSelfPermission(this, 
+                                    anifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED 
+                                    && ActivityCompat.checkSelfPermission(this, 
+                                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    return null;
+                                }
+                                locationManager.requestLocationUpdates(
+                                        LocationManager.NETWORK_PROVIDER,
+                                        MIN_TIME_BW_UPDATES,
+                                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                                Log.d(Network, Network);
+                                if (locationManager != null) {
+                                    location = locationManager
+                                            .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                    if (location != null) {
+                                        latitude = location.getLatitude();
+                                        longitude = location.getLongitude();
+                                    }
+                                }
+                            }
+                            if (isGPSEnabled) {
+                                // Gets location and its updates in Google Maps Android API V2. 
+                                if (location == null) {
+                                    locationManager.requestLocationUpdates(
+                                            LocationManager.GPS_PROVIDER,
+                                            MIN_TIME_BW_UPDATES,
+                                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                                    Log.d(GPS Enabled, GPS Enabled);
+                                    if (locationManager != null) {
+                                        location = locationManager
+                                                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                                        if (location != null) {
+                                            latitude = location.getLatitude();
+                                            longitude = location.getLongitude();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return location;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the goal of the invokation to the checkSelfPermission method?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To check whether the app has access to the device GPS location
+						    <br><input type="radio" name="gender" value="opt2"> To check whether the app has access to the location provided by the Network Provider
+						    <br><input type="radio" name="gender" value="opt3"> To check whether the app has access to the device GPS location or by the Network Provider 
+						</form>
+						<br>2. <strong>What happens if the GPS is enabled?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The app requires the GPS location to the APIs and in particular latitude and longitude 
+						    <br><input type="radio" name="gender" value="opt2"> The GPS is turned off
+						    <br><input type="radio" name="gender" value="opt3"> The last known GPS location is printed on screen
+						</form>
+						<br>3. <strong>When does the method return null?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> If there is an error in receiving the position from the GPS device
+						    <br><input type="radio" name="gender" value="opt2"> If the app has no permissions to access the device location 
+						    <br><input type="radio" name="gender" value="opt3"> If the GPS is not enabled
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s6" style="width:100%">
+                <tr>
+                    <td>Code Snippet #6</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        Timber.d(FB login success);
+                        if (loginResult == null) {
+                            Timber.e(Fb login succeed with null loginResult.);
+                            handleNonFatalError(getString(R.string.Facebook_login_failed), true);
+                        } else {
+                            Timber.d(Result: %s, loginResult.toString());
+                            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
+                                    new GraphRequest.GraphJSONObjectCallback() {
+                                        @Override
+                                        public void onCompleted(JSONObject object, GraphResponse response) {
+                                            if (response != null && response.getError() == null) {
+                                                verifyUserOnApi(object, loginResult.getAccessToken());
+                                            } else {
+                                                Timber.e(Error on receiving user profile information.);
+                                                if (response != null && response.getError() != null) {
+                                                    Timber.e(new RuntimeException(), Error: %s, response.getError().toString());
+                                                }
+                                                handleNonFatalError(getString(R.string.Receiving_facebook_profile_failed), true);
+                                            }
+                                        }
+                                    });
+                            Bundle parameters = new Bundle();
+                            parameters.putString(fields, id, name, email, gender);
+                            request.setParameters(parameters);
+                            request.executeAsync();
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        Timber.d(FB login success);
+                        if (loginResult == null) {
+                            Timber.e(Fb login succeed with null loginResult.);
+                            handleNonFatalError(getString(R.string.Facebook_login_failed), true);
+                        } else {
+                            // Sees users information through Facebook Graph API. 
+                            Timber.d(Result: %s, loginResult.toString());
+                            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
+                                    new GraphRequest.GraphJSONObjectCallback() {
+                                        @Override
+                                        public void onCompleted(JSONObject object, GraphResponse response) {
+                                            if (response != null && response.getError() == null) {
+                                                verifyUserOnApi(object, loginResult.getAccessToken());
+                                            } else {
+                                                Timber.e(Error on receiving user profile information.);
+                                                if (response != null && response.getError() != null) {
+                                                    Timber.e(new RuntimeException(), Error: %s, response.getError().toString());
+                                                }
+                                                handleNonFatalError(getString(R.string.Receiving_facebook_profile_failed), true);
+                                            }
+                                        }
+                                    });
+                            Bundle parameters = new Bundle();
+                            parameters.putString(fields, id, name, email, gender);
+                            request.setParameters(parameters);
+                            request.executeAsync();
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>This snippet of code relies on APIs useful to access information about:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The Facebook friends list of a given account
+						    <br><input type="radio" name="gender" value="opt2"> A Whatsapp contact
+						    <br><input type="radio" name="gender" value="opt3"> A Facebook profile 
+						</form>
+						<br>2. <strong>What is the prerequisite allowing to successfully retrieve the required information?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The network connection is enabled
+						    <br><input type="radio" name="gender" value="opt2"> The apps user is successfully logged to her Facebook account 
+						    <br><input type="radio" name="gender" value="opt3"> The smartphone can access the Facebooks contact list
+						</form>
+						<br>3. <strong>Which is the class in charge of requesting the required information?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> GraphRequest
+						    <br><input type="radio" name="gender" value="opt2"> Bundle
+						    <br><input type="radio" name="gender" value="opt3"> Timber
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s7" style="width:100%">
+                <tr>
+                    <td>Code Snippet #7</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        try {
+                            URL u = new URL(url);
+                            HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                            c.setRequestMethod(GET);
+                            c.setRequestProperty(Content - length, 0);
+                            c.setUseCaches(false);
+                            c.setAllowUserInteraction(false);
+                            c.setConnectTimeout(timeout);
+                            c.setReadTimeout(timeout);
+                            c.connect();
+                            int status = c.getResponseCode();
+                            switch (status) {
+                                case 200:
+                                case 201:
+                                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                                    StringBuilder sb = new StringBuilder();
+                                    String line;
+                                    while ((line = br.readLine()) != null) {
+                                        sb.append(line +
+                                        );
+                                    }
+                                    br.close();
+                                    return sb.toString();
+                            }
+                        } catch (MalformedURLException e) {
+                            Log.e(TAG, e.getMessage());
+                        } catch (IOException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                        return null;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // JSON parser from web page. 
+                        try {
+                            URL u = new URL(url);
+                            HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                            c.setRequestMethod(GET);
+                            c.setRequestProperty(Content - length, 0);
+                            c.setUseCaches(false);
+                            c.setAllowUserInteraction(false);
+                            c.setConnectTimeout(timeout);
+                            c.setReadTimeout(timeout);
+                            c.connect();
+                            int status = c.getResponseCode();
+                            switch (status) {
+                                // Reads variable amount of json data from url. 
+                                case 200:
+                                case 201:
+                                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                                    StringBuilder sb = new StringBuilder();
+                                    String line;
+                                    while ((line = br.readLine()) != null) {
+                                        sb.append(line +
+                                        );
+                                    }
+                                    br.close();
+                                    return sb.toString();
+                            }
+                        } catch (MalformedURLException e) {
+                            Log.e(TAG, e.getMessage());
+                        } catch (IOException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                        return null;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of this code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To store in a string the result of a HTTP request 
+						    <br><input type="radio" name="gender" value="opt2"> To test the connection performed via a HTTP request
+						    <br><input type="radio" name="gender" value="opt3"> To ping a server checking whether it replies within 200 seconds
+						</form>
+						<br>2. <strong>Does the snippet of code retrieves any data with a HTTP request?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> No
+						    <br><input type="radio" name="gender" value="opt2"> Yes, 200 bytes
+						    <br><input type="radio" name="gender" value="opt3"> Yes, a variable amount of data
+						</form>
+						<br>3. <strong>How many HTTP response status code are managed in the snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Zero
+						    <br><input type="radio" name="gender" value="opt2"> One
+						    <br><input type="radio" name="gender" value="opt3"> Two
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s8" style="width:100%">
+                <tr>
+                    <td>Code Snippet #8</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+        phoneContacts.clear();
+        Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        Integer contactsCount = cursor.getCount();
+        if (contactsCount > 0) {
+            while (cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                    Cursor pCursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + = ?,
+                    new String[]{id}, null);
+                    while (pCursor.moveToNext()) {
+                        int phoneType = pCursor.getInt(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                        String phoneNo = pCursor.getString(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        String phoneNumberID = pCursor.getString(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
+                        String type = null;
+                        switch (phoneType) {
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                                type = M;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                                type = H;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                                type = W;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK_MOBILE:
+                                type = WM;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_OTHER:
+                                type = O;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (!whatsAppIDs.contains(phoneNumberID))
+                            phoneContacts.add(new PhoneContact(phoneNo, contactName, type, id, phoneNumberID));
+                        Log.i(Contact details:,phoneNo + :+contactName + :+type + :+id + :+phoneNumberID);
+                        Log.i(contacts type:,
+                        pCursor.getString(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.ACCOUNT_TYPE_AND_DATA_SET)))
+                        ;
+                    }
+                    pCursor.close();
+                }
+            }
+            cursor.close();
+        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+        // Reads Distinct Contacts with Contact Number and Names.
+        phoneContacts.clear();
+        Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        Integer contactsCount = cursor.getCount();
+        if (contactsCount > 0) {
+
+            while (cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                    Cursor pCursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + = ?,
+                    new String[]{id}, null);
+                    while (pCursor.moveToNext()) {
+                        int phoneType = pCursor.getInt(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                        String phoneNo = pCursor.getString(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        String phoneNumberID = pCursor.getString(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
+                        String type = null;
+                        switch (phoneType) {
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                                type = M;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                                type = H;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                                type = W;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK_MOBILE:
+                                type = WM;
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_OTHER:
+                                type = O;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (!whatsAppIDs.contains(phoneNumberID))
+                            phoneContacts.add(new PhoneContact(phoneNo, contactName, type, id, phoneNumberID));
+                        Log.i(Contact details:,phoneNo + :+contactName + :+type + :+id + :+phoneNumberID);
+                        Log.i(contacts type:,
+                        pCursor.getString(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.ACCOUNT_TYPE_AND_DATA_SET)))
+                        ;
+                    }
+                    pCursor.close();
+                }
+            }
+            cursor.close();
+        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of the code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To retrieve information about the phone contacts
+						    <br><input type="radio" name="gender" value="opt2"> To extract the list of Whatsapp contacts
+						    <br><input type="radio" name="gender" value="opt3"> To extract the phone contacts that are not Whatsapp contacts 
+						</form>
+						<br>2. <strong>The Cursor cursor object is used to:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Iterate the contact list 
+						    <br><input type="radio" name="gender" value="opt2"> Iterate the contact details
+						    <br><input type="radio" name="gender" value="opt3"> Iterate the telephone numbers associated to the contact
+						</form>
+						<br>3. <strong>Which basic information is retrieved for each contact?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Name & Number 
+						    <br><input type="radio" name="gender" value="opt2"> Name
+						    <br><input type="radio" name="gender" value="opt3"> Other
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s9" style="width:100%">
+                <tr>
+                    <td>Code Snippet #9</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        InputStream is = context.getContentResolver().openInputStream(photoUri);
+                        BitmapFactory.Options dbo = new BitmapFactory.Options();
+                        dbo.inJustDecodeBounds = true;
+                        BitmapFactory.decodeStream(is, null, dbo);
+                        is.close();
+                        int rotatedWidth, rotatedHeight;
+                        int orientation = getOrientation(context, photoUri);
+                        if (orientation == 90 || orientation == 270) {
+                            rotatedWidth = dbo.outHeight;
+                            rotatedHeight = dbo.outWidth;
+                        } else {
+                            rotatedWidth = dbo.outWidth;
+                            rotatedHeight = dbo.outHeight;
+                        }
+                        Bitmap srcBitmap;
+                        is = context.getContentResolver().openInputStream(photoUri);
+                        if (rotatedWidth > MAX_IMAGE_DIMENSION || rotatedHeight > MAX_IMAGE_DIMENSION) {
+                            float widthRatio = ((float) rotatedWidth) / ((float) MAX_IMAGE_DIMENSION);
+                            float heightRatio = ((float) rotatedHeight) / ((float) MAX_IMAGE_DIMENSION);
+                            float maxRatio = Math.max(widthRatio, heightRatio);
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inSampleSize = (int) maxRatio;
+                            srcBitmap = BitmapFactory.decodeStream(is, null, options);
+                        } else {
+                            srcBitmap = BitmapFactory.decodeStream(is);
+                        }
+                        is.close();
+                        if (orientation > 0) {
+                            Matrix matrix = new Matrix();
+                            matrix.postRotate(orientation);
+                            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                                    srcBitmap.getHeight(), matrix, true);
+                        }
+                        String type = context.getContentResolver().getType(photoUri);
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        if (type.equals(image / png)) {
+                            srcBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                        } else if (type.equals(image / jpg) || type.equals(image / jpeg)) {
+                            srcBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                        }
+                        byte[] bMapArray = baos.toByteArray();
+                        baos.close();
+                        return BitmapFactory.decodeByteArray(bMapArray, 0, bMapArray.length);
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        InputStream is = context.getContentResolver().openInputStream(photoUri);
+                        BitmapFactory.Options dbo = new BitmapFactory.Options();
+                        dbo.inJustDecodeBounds = true;
+                        BitmapFactory.decodeStream(is, null, dbo);
+                        is.close();
+                        int rotatedWidth, rotatedHeight;
+                        int orientation = getOrientation(context, photoUri);
+                        if (orientation == 90 || orientation == 270) {
+                            rotatedWidth = dbo.outHeight;
+                            rotatedHeight = dbo.outWidth;
+                        } else {
+                            rotatedWidth = dbo.outWidth;
+                            rotatedHeight = dbo.outHeight;
+                        }
+                        Bitmap srcBitmap;
+                        is = context.getContentResolver().openInputStream(photoUri);
+                        if (rotatedWidth > MAX_IMAGE_DIMENSION || rotatedHeight > MAX_IMAGE_DIMENSION) {
+                            // Resizes image before decoding it to bitmaps. 
+                            float widthRatio = ((float) rotatedWidth) / ((float) MAX_IMAGE_DIMENSION);
+                            float heightRatio = ((float) rotatedHeight) / ((float) MAX_IMAGE_DIMENSION);
+                            float maxRatio = Math.max(widthRatio, heightRatio);
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inSampleSize = (int) maxRatio;
+                            srcBitmap = BitmapFactory.decodeStream(is, null, options);
+                        } else {
+                            srcBitmap = BitmapFactory.decodeStream(is);
+                        }
+                        is.close();
+                        if (orientation > 0) {
+                            // Rotates a bitmap. 
+                            Matrix matrix = new Matrix();
+                            matrix.postRotate(orientation);
+                            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                                    srcBitmap.getHeight(), matrix, true);
+                        }
+                        String type = context.getContentResolver().getType(photoUri);
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        if (type.equals(image / png)) {
+                            srcBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                        } else if (type.equals(image / jpg) || type.equals(image / jpeg)) {
+                            srcBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                        }
+                        byte[] bMapArray = baos.toByteArray();
+                        baos.close();
+                        return BitmapFactory.decodeByteArray(bMapArray, 0, bMapArray.length);
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of the code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To deal with the screen size when rotating the device
+						    <br><input type="radio" name="gender" value="opt2"> To scale an image depending on the screen rotation 
+						    <br><input type="radio" name="gender" value="opt3"> To block the screen rotation
+						</form>
+						<br>2. <strong>The main object manipulated in the snippet is:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The screen
+						    <br><input type="radio" name="gender" value="opt2"> A bitmap image 
+						    <br><input type="radio" name="gender" value="opt3"> A jpeg image
+						</form>
+						<br>3. <strong>What are the main manipulations performed on the object?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Rotation
+						    <br><input type="radio" name="gender" value="opt2"> Resizing
+						    <br><input type="radio" name="gender" value="opt3"> Rotation and resizing 
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s10" style="width:100%">
+                <tr>
+                    <td>Code Snippet #10</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        Palette palette = Palette.generate(bitmap, 16);
+                        int midColor = palette.getVibrantColor(
+                                palette.getDarkVibrantColor(
+                                        palette.getMutedColor(
+                                                palette.getDarkMutedColor(Color.GRAY))));
+                        int lightColor = palette.getLightMutedColor(
+                                palette.getLightVibrantColor(
+                                        palette.getMutedColor(Color.BLACK)));
+                        if (lightColor == Color.BLACK) {
+                            lightColor = lighten(midColor, 0.2f);
+                        }
+                        return new Pair<>(lightColor, midColor);
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // Extracts the most prominent colour from an image. 
+                        Palette palette = Palette.generate(bitmap, 16);
+                        int midColor = palette.getVibrantColor(
+                                palette.getDarkVibrantColor(
+                                        palette.getMutedColor(
+                                                palette.getDarkMutedColor(Color.GRAY))));
+                        int lightColor = palette.getLightMutedColor(
+                                palette.getLightVibrantColor(
+                                        palette.getMutedColor(Color.BLACK)));
+                        if (lightColor == Color.BLACK) {
+                            lightColor = lighten(midColor, 0.2f);
+                        }
+                        return new Pair<>(lightColor, midColor);
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of the code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To remove some colors from an image
+						    <br><input type="radio" name="gender" value="opt2"> To modify the colors in an image
+						    <br><input type="radio" name="gender" value="opt3"> To extract some colors of interest from an image 
+						</form>
+						<br>2. <strong>The palette object represents:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The colors extracted from an image 
+						    <br><input type="radio" name="gender" value="opt2"> The colors of a default palette
+						    <br><input type="radio" name="gender" value="opt3"> A gray scale without the BLACK and GRAY colors
+						</form>
+						<br>3. <strong>The method returns:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> 1 Color
+						    <br><input type="radio" name="gender" value="opt2"> 2 colors 
+						    <br><input type="radio" name="gender" value="opt3"> 16 colors
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s11" style="width:100%">
+                <tr>
+                    <td>Code Snippet #11</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        NetworkInfo networkInfo = ((ConnectivityManager) context
+                                .getSystemService(Context.CONNECTIVITY_SERVICE))
+                                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                        if (networkInfo != null && networkInfo.isConnected()) {
+                            int subtype = networkInfo.getSubtype();
+                            if (subtype == TelephonyManager.NETWORK_TYPE_EVDO_A
+                                    || subtype == TelephonyManager.NETWORK_TYPE_EVDO_0
+                                    || subtype == TelephonyManager.NETWORK_TYPE_UMTS
+                                    || subtype == TelephonyManager.NETWORK_TYPE_HSPA) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // Determines if network type is 2G, 3G or 4G. 
+                        NetworkInfo networkInfo = ((ConnectivityManager) context
+                                .getSystemService(Context.CONNECTIVITY_SERVICE))
+                                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                        if (networkInfo != null && networkInfo.isConnected()) {
+                            int subtype = networkInfo.getSubtype();
+                            if (subtype == TelephonyManager.NETWORK_TYPE_EVDO_A
+                                    || subtype == TelephonyManager.NETWORK_TYPE_EVDO_0
+                                    || subtype == TelephonyManager.NETWORK_TYPE_UMTS
+                                    || subtype == TelephonyManager.NETWORK_TYPE_HSPA) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of the code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> It checks whether the device is connected to the mobile network 
+						    <br><input type="radio" name="gender" value="opt2"> It checks whether the device is connected to the mobile network or to the WiFi
+						    <br><input type="radio" name="gender" value="opt3"> It checks whether the device is connected to the WiFi
+						</form>
+						<br>2. <strong>How may connection types (e.g., 2G, WiFi, 3G, etc) are considered in the snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> One
+						    <br><input type="radio" name="gender" value="opt2"> Three 
+						    <br><input type="radio" name="gender" value="opt3"> Four
+						</form>
+						<br>3. <strong>What happens if the smartphone is not connected to any network?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> An exception is raised
+						    <br><input type="radio" name="gender" value="opt2"> The method returns null
+						    <br><input type="radio" name="gender" value="opt3"> The method returns false 
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s12" style="width:100%">
+                <tr>
+                    <td>Code Snippet #12</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        super(context, attrs);
+                        setOrientation(LinearLayout.VERTICAL);
+                        setBackgroundResource(R.drawable.settings_popup);
+                        LayoutInflater.from(getContext()).inflate(R.layout.popup_settings_view, this, true);
+                        mSoundText = (TextView) findViewById(R.id.sound_off_text);
+                        TextView rateView = (TextView) findViewById(R.id.rate_text);
+                        FontLoader.setTypeface(context, new TextView[]{mSoundText, rateView}, Font.GROBOLD);
+                        mSoundImage = (ImageView) findViewById(R.id.sound_image);
+                        View soundOff = findViewById(R.id.sound_off);
+                        soundOff.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Music.OFF = !Music.OFF;
+                                setMusicButton();
+                            }
+                        });
+                        View rate = findViewById(R.id.rate);
+                        rate.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                final String appPackageName = Shared.context.getPackageName();
+                                try {
+                                    Shared.activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(market://details?id= + appPackageName)));
+                                } catch (android.content.ActivityNotFoundException anfe) {
+                                    Shared.activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(http://play.google.com/store/apps/details?id= + appPackageName)));
+                                }
+                            }
+                        });
+                        setMusicButton();
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        super(context, attrs);
+                        setOrientation(LinearLayout.VERTICAL);
+                        setBackgroundResource(R.drawable.settings_popup);
+                        LayoutInflater.from(getContext()).inflate(R.layout.popup_settings_view, this, true);
+                        mSoundText = (TextView) findViewById(R.id.sound_off_text);
+                        TextView rateView = (TextView) findViewById(R.id.rate_text);
+                        FontLoader.setTypeface(context, new TextView[]{mSoundText, rateView}, Font.GROBOLD);
+                        mSoundImage = (ImageView) findViewById(R.id.sound_image);
+                        View soundOff = findViewById(R.id.sound_off);
+                        soundOff.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Music.OFF = !Music.OFF;
+                                setMusicButton();
+                            }
+                        });
+                        View rate = findViewById(R.id.rate);
+                        rate.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // Opens play store app direclty and searches a package. 
+                                final String appPackageName = Shared.context.getPackageName();
+                                try {
+                                    Shared.activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(market://details?id= + appPackageName)));
+                                } catch (android.content.ActivityNotFoundException anfe) {
+                                    Shared.activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(http://play.google.com/store/apps/details?id= + appPackageName)));
+                                }
+                            }
+                        });
+                        setMusicButton();
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>Which external url is accessed by the snippet of code?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> A web server providing private services to the app (i.e., services built by the apps developers)
+						    <br><input type="radio" name="gender" value="opt2"> Amazon
+						    <br><input type="radio" name="gender" value="opt3"> Google Play Store 
+						</form>
+						<br>2. <strong>Which parameter is provided in the accessed url?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The id of the apps user
+						    <br><input type="radio" name="gender" value="opt2"> The path of the package in which the code snippet is implemented
+						    <br><input type="radio" name="gender" value="opt3"> The apps package name 
+						</form>
+						<br>3. <strong>Which of these properties is set in the code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The Font TypeFace 
+						    <br><input type="radio" name="gender" value="opt2"> The screen resolution
+						    <br><input type="radio" name="gender" value="opt3"> The Font TypeFace and the screen resolution
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s13" style="width:100%">
+                <tr>
+                    <td>Code Snippet #13</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        final SharedPreferences prefs = getGCMPreferences(context);
+                        String registrationId = prefs.getString(PROPERTY_REG_ID, );
+                        final int oldVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+                        final int newVersion = BuildConfig.VERSION_CODE;
+                        if (oldVersion != Integer.MIN_VALUE && oldVersion != newVersion) {
+                            Log.v(TAG, App version changed from + oldVersion + to + newVersion
+                                    +; resetting registration id);
+                            clearRegistrationId(context);
+                            registrationId =;
+                        }
+                        return registrationId;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // Checks if the device is registered with GCM because official tutorial 
+                        // states regID is not guaranteed to last indefinitely. 
+                        final SharedPreferences prefs = getGCMPreferences(context);
+                        String registrationId = prefs.getString(PROPERTY_REG_ID, );
+                        final int oldVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+                        final int newVersion = BuildConfig.VERSION_CODE;
+                        if (oldVersion != Integer.MIN_VALUE && oldVersion != newVersion) {
+                            Log.v(TAG, App version changed from + oldVersion + to + newVersion
+                                    +; resetting registration id);
+                            clearRegistrationId(context);
+                            registrationId =;
+                        }
+                        return registrationId;
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of this code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To get the app registration id
+						    <br><input type="radio" name="gender" value="opt2"> To get the device registration id 
+						    <br><input type="radio" name="gender" value="opt3"> To get the user registration id
+						</form>
+						<br>2. <strong>What happens if the app has been updated?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The registration id is cleared 
+						    <br><input type="radio" name="gender" value="opt2"> The registration id is updated as well
+						    <br><input type="radio" name="gender" value="opt3"> The registration id is set to null
+						</form>
+						<br>3. <strong>Which of the following services is used in the snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Firabase Cloud Messaging (FCM)
+						    <br><input type="radio" name="gender" value="opt2"> Dropbox
+						    <br><input type="radio" name="gender" value="opt3"> Google Cloud Messaging (GCM) 
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s14" style="width:100%">
+                <tr>
+                    <td>Code Snippet #14</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        super.onDraw(canvas);
+                        switch (shape) {
+                            case 0:
+                                canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+                                break;
+                            case 1:
+                                canvas.drawCircle((getWidth() / 2) - getPaddingLeft() - getPaddingRight()
+                                        , (getHeight() / 2) - getPaddingTop() - getPaddingBottom()
+                                        , (getWidth() / 2) - getPaddingLeft() - getPaddingBottom(), paint);
+                                break;
+                            case 2:
+                                canvas.drawLine(0, 0, getWidth(), getHeight(), paint);
+                                break;
+                            case 3:
+                                canvas.drawRoundRect(0, 0, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), paint);
+                                break;
+                            default:
+                                canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // Centers a shape created through canvas. 
+                        super.onDraw(canvas);
+                        switch (shape) {
+                            case 0:
+                                canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+                                break;
+                            case 1:
+                                canvas.drawCircle((getWidth() / 2) - getPaddingLeft() - getPaddingRight()
+                                        , (getHeight() / 2) - getPaddingTop() - getPaddingBottom()
+                                        , (getWidth() / 2) - getPaddingLeft() - getPaddingBottom(), paint);
+                                break;
+                            case 2:
+                                canvas.drawLine(0, 0, getWidth(), getHeight(), paint);
+                                break;
+                            case 3:
+                                canvas.drawRoundRect(0, 0, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), paint);
+                                break;
+                            default:
+                                canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the commonality among the shapes drawn on screen?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> They all have a black background
+						    <br><input type="radio" name="gender" value="opt2"> They all start at x-y coordinates 0-0
+						    <br><input type="radio" name="gender" value="opt3"> They are all centered on the screen 
+						</form>
+						<br>2. <strong>Which of these claims is certainly true:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> This snippet is implemented in a subclass 
+						    <br><input type="radio" name="gender" value="opt2"> This snippet is implemented in a superclass
+						    <br><input type="radio" name="gender" value="opt3"> This snippet is implemented in a class do not involved in a hierarchy
+						</form>
+						<br>3. <strong>What happens if shape = 4?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> A rectangle is drawn on screen 
+						    <br><input type="radio" name="gender" value="opt2"> Nothing is drawn on screen
+						    <br><input type="radio" name="gender" value="opt3"> The behaviour of the method for this value is undefined
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s15" style="width:100%">
+                <tr>
+                    <td>Code Snippet #15</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        Drawable drawable = getDrawable();
+                        if (drawable == null || drawable.getIntrinsicWidth() == 0 || drawable.getIntrinsicHeight() == 0) {
+                            setMeasuredDimension(0, 0);
+                            return;
+                        }
+                        int drawableWidth = drawable.getIntrinsicWidth();
+                        int drawableHeight = drawable.getIntrinsicHeight();
+                        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+                        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+                        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+                        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+                        viewWidth = setViewSize(widthMode, widthSize, drawableWidth);
+                        viewHeight = setViewSize(heightMode, heightSize, drawableHeight);
+                        setMeasuredDimension(viewWidth, viewHeight);
+                        fitImageToView();
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // Scale any image (of imageview) with width equal to match parents. 
+                        Drawable drawable = getDrawable();
+                        if (drawable == null || drawable.getIntrinsicWidth() == 0 || drawable.getIntrinsicHeight() == 0) {
+                            setMeasuredDimension(0, 0);
+                            return;
+                        }
+                        int drawableWidth = drawable.getIntrinsicWidth();
+                        int drawableHeight = drawable.getIntrinsicHeight();
+                        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+                        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+                        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+                        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+                        viewWidth = setViewSize(widthMode, widthSize, drawableWidth);
+                        viewHeight = setViewSize(heightMode, heightSize, drawableHeight);
+                        setMeasuredDimension(viewWidth, viewHeight);
+                        fitImageToView();
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of this code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> To retrieve the screen size
+						    <br><input type="radio" name="gender" value="opt2"> To fit an image to its parents size 
+						    <br><input type="radio" name="gender" value="opt3"> To change the size of a view
+						</form>
+						<br>2. <strong>If the intrinsic width of the drawable object equals zero:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> An error is returned
+						    <br><input type="radio" name="gender" value="opt2"> A new view is created
+						    <br><input type="radio" name="gender" value="opt3"> The size of an image is set to zero 
+						</form>
+						<br>3. <strong>What does drawableWidth represents?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> The default width of a Drawable object 
+						    <br><input type="radio" name="gender" value="opt2"> The width of a Drawable objects parent
+						    <br><input type="radio" name="gender" value="opt3"> The width of an image contained in a Drawable object
+						</form>
+                    </td>
+                </tr>
+            </table>
+            <table id="s16" style="width:100%">
+                <tr>
+                    <td>Code Snippet #16</td>
+                </tr>
+                <tr>
+                    <th>Without Comment</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        super.onCreate(savedInstanceState);
+                        setContentView(R.layout.activity_webview_extras);
+                        final WebView webView = (WebView) findViewById(R.id.wv_main);
+                        webView.getSettings().setDisplayZoomControls(false);
+                        webView.getSettings().setSupportZoom(false);
+                        webView.getSettings().setBuiltInZoomControls(false);
+                        webView.getSettings().setJavaScriptEnabled(true);
+                        webView.loadUrl(file:///android_asset/ + getIntent().getStringExtra(EXTRA_ASSET_FILE));
+                        final ActionBar actionBar = getSupportActionBar();
+                        if (actionBar != null) {
+                            actionBar.setDisplayHomeAsUpEnabled(true);
+                            webView.setWebViewClient(new WebViewClient() {
+                                @Override
+                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                    if (url.startsWith(http)) {
+                                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                                        return true;
+                                    }
+                                    return false;
+                                }
+
+                                @Override
+                                public void onPageFinished(WebView view, String url) {
+                                    actionBar.setTitle(view.getTitle());
+                                    try {
+                                        PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                                        view.loadUrl(javascript:update_app_info(+
+                                                packageInfo.versionName +, +
+                                                packageInfo.versionCode +););
+                                    } catch (PackageManager.NameNotFoundException e) {
+                                        Log.w(getClass().getName(), e);
+                                    }
+                                }
+                            });
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th>Automatically Commented by ADANA</th>
+                </tr>
+                <tr>
+                    <td><pre><code class="java">
+                        // Runs YouTube Video. 
+                        super.onCreate(savedInstanceState);
+                        setContentView(R.layout.activity_webview_extras);
+                        final WebView webView = (WebView) findViewById(R.id.wv_main);
+                        webView.getSettings().setDisplayZoomControls(false);
+                        webView.getSettings().setSupportZoom(false);
+                        webView.getSettings().setBuiltInZoomControls(false);
+                        webView.getSettings().setJavaScriptEnabled(true);
+                        webView.loadUrl(file:///android_asset/ + getIntent().getStringExtra(EXTRA_ASSET_FILE));
+                        final ActionBar actionBar = getSupportActionBar();
+                        if (actionBar != null) {
+                            actionBar.setDisplayHomeAsUpEnabled(true);
+                            webView.setWebViewClient(new WebViewClient() {
+                                @Override
+                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                    // Opens a URL in Android s web browser from my application. 
+                                    if (url.startsWith(http)) {
+                                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                                        return true;
+                                    }
+                                    return false;
+                                }
+
+                                @Override
+                                public void onPageFinished(WebView view, String url) {
+                                    actionBar.setTitle(view.getTitle());
+                                    try {
+                                        PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                                        view.loadUrl(javascript:update_app_info(+
+                                                packageInfo.versionName +, +
+                                                packageInfo.versionCode +););
+                                    } catch (PackageManager.NameNotFoundException e) {
+                                        Log.w(getClass().getName(), e);
+                                    }
+                                }
+                            });
+                        }
+                    </code></pre></td>
+                </tr>
+                <tr>
+                    <th><u>Veriﬁcation Questions</u></th>
+                </tr>
+                <tr>
+                    <td>
+                        <br>1. <strong>What is the main goal of this code snippet?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> It shows the resources loaded from a URL in a WebView 
+						    <br><input type="radio" name="gender" value="opt2"> It loads a Javascript application in the browser
+						    <br><input type="radio" name="gender" value="opt3"> It deletes the browsers cache
+						</form>
+						<br>2. <strong>What is the main goal of the shouldOverrideUrlLoading method?</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Refreshes a website shown in the Android browser
+						    <br><input type="radio" name="gender" value="opt2"> Checks the validity of a provided URL
+						    <br><input type="radio" name="gender" value="opt3"> Opens a URL in the WebView 
+						</form>
+						<br>3. <strong>Invoking the method setDisplayHomeAsUpEnabled:</strong>
+						<form action="">
+						    <input type="radio" name="gender" value="opt1"> Impacts the way the home screen can be reached in the app 
+						    <br><input type="radio" name="gender" value="opt2"> Creates a menu allowing to navigate back to the home screen
+						    <br><input type="radio" name="gender" value="opt3"> Shows the home screen in the app
+						</form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

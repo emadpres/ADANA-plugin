@@ -1,0 +1,10 @@
+Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.icons);
+NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setLargeIcon(largeIcon).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(remoteMessage.getNotification().getTitle()).setContentText(remoteMessage.getNotification().getBody());
+NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            manager.notify(0, builder.build());;
+String name = remoteMessage.getNotification().getIcon();
+URL url_value = new URL(name);
+Bitmap mIcon1 = BitmapFactory.decodeStream(url_value.openConnection().getInputStream());
+NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setLargeIcon(mIcon1).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(remoteMessage.getNotification().getTitle()).setContentText(remoteMessage.getNotification().getBody());
+NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.notify(0, builder.build());;

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="metric_calculator">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/metric_calculator.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/metric_calculator.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,13 @@
+simian-configuration
+-------------------------------
+threshold="3"
+ignoreCharacterCase="true"
+ignoreCurlyBraces="true"
+ignoreIdentifierCase="true"
+ignoreIdentifiers="true"
+ignoreLiterals="true"
+ignoreModifiers="true"
+ignoreNumbers="true"
+ignoreStringCase="true"
+ignoreStrings="true"
+ignoreVariableNames="true"

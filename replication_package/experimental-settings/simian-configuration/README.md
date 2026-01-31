@@ -1,0 +1,1 @@
+You can find the configuration used for Simian clone detector in "simian-configuration.txt" file.
